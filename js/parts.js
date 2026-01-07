@@ -1,4 +1,9 @@
-// Parts System - Defines all robot parts, rarities, and combinations
+// UNIFIED PARTS SYSTEM - Combines Game Parts and Grid Parts
+// This file merges both systems into one coherent structure
+
+// ============================================
+// PART TYPE ENUMS
+// ============================================
 
 const PART_TYPES = {
     HEAD: 'head',
@@ -25,118 +30,262 @@ const DROP_CHANCES = {
     [RARITY.EPIC]: 0.03
 };
 
-// Base part definitions
+// ============================================
+// GRID SHAPES (for Grid Inventory)
+// ============================================
+
+const GRID_SHAPES = {
+    chip: [[1]],
+    sensor: [[1, 1]],
+    wire: [[1], [1]],
+    standardArm: [[1, 1], [1, 0]],
+    booster: [[1], [1], [1]],
+    lShape: [[1, 0], [1, 0], [1, 1]],
+    tinyBlock: [[1, 1], [1, 1]],
+    heavyPlate: [[1, 1, 1], [1, 1, 1]],
+    laserCannon: [[0, 1, 0], [1, 1, 1], [0, 1, 0]],
+    longBar: [[1], [1], [1], [1], [1]],
+    bigL: [[1, 1, 1], [1, 0, 0], [1, 0, 0]],
+    titanCore: [[1, 1, 1], [1, 1, 1], [1, 1, 1]],
+    mechaSkeleton: [[1, 0, 1], [1, 1, 1], [1, 0, 1], [1, 0, 1]]
+};
+
+// ============================================
+// PART DEFINITIONS (Game + Grid Data)
+// ============================================
+
 const PART_DEFINITIONS = {
-    // Tier 1 - Schrott-Bots
-    rustyHead: { name: 'Rostiger Kopf', type: PART_TYPES.HEAD, tier: 1, stats: { vision: 5, special: 0 } },
-    rustyTorso: { name: 'Rost-Torso', type: PART_TYPES.TORSO, tier: 1, stats: { hp: 20, armor: 5 } },
-    rustyArm: { name: 'Rost-Arm', type: PART_TYPES.RIGHT_ARM, tier: 1, stats: { damage: 5, range: 30 } },
-    rustyLegs: { name: 'Rost-Beine', type: PART_TYPES.LEGS, tier: 1, stats: { speed: 2, jump: 8 } },
+    // HEAD PARTS
+    rustyHead: { 
+        name: 'Rostiger Kopf', 
+        type: PART_TYPES.HEAD, 
+        tier: 1, 
+        stats: { vision: 5, special: 0 }, 
+        gridShape: 'sensor' 
+    },
+    sparkHead: { 
+        name: 'Funken-Kopf', 
+        type: PART_TYPES.HEAD, 
+        tier: 1, 
+        stats: { vision: 8, special: 5 }, 
+        gridShape: 'sensor' 
+    },
+    laserHead: { 
+        name: 'Laser-Visier', 
+        type: PART_TYPES.HEAD, 
+        tier: 2, 
+        stats: { vision: 15, special: 10, autoAim: true }, 
+        gridShape: 'standardArm' 
+    },
+    stealthHead: { 
+        name: 'Tarn-Kopf', 
+        type: PART_TYPES.HEAD, 
+        tier: 3, 
+        stats: { vision: 12, special: 20, stealth: true }, 
+        gridShape: 'sensor' 
+    },
 
-    sparkHead: { name: 'Funken-Kopf', type: PART_TYPES.HEAD, tier: 1, stats: { vision: 8, special: 5 } },
-    sparkLegs: { name: 'Sprung-Beine', type: PART_TYPES.LEGS, tier: 1, stats: { speed: 4, jump: 12 } },
+    // TORSO PARTS
+    rustyTorso: { 
+        name: 'Rost-Torso', 
+        type: PART_TYPES.TORSO, 
+        tier: 1, 
+        stats: { hp: 20, armor: 5 }, 
+        gridShape: 'tinyBlock' 
+    },
+    drillTorso: { 
+        name: 'Panzer-Torso', 
+        type: PART_TYPES.TORSO, 
+        tier: 1, 
+        stats: { hp: 30, armor: 10 }, 
+        gridShape: 'tinyBlock' 
+    },
+    bladeTorso: { 
+        name: 'Leicht-Torso', 
+        type: PART_TYPES.TORSO, 
+        tier: 2, 
+        stats: { hp: 25, armor: 5 }, 
+        gridShape: 'sensor' 
+    },
+    heavyTorso: { 
+        name: 'Panzer-Koloss', 
+        type: PART_TYPES.TORSO, 
+        tier: 3, 
+        stats: { hp: 60, armor: 25 }, 
+        gridShape: 'heavyPlate' 
+    },
 
-    drillArm: { name: 'Bohrer-Arm', type: PART_TYPES.RIGHT_ARM, tier: 1, stats: { damage: 10, range: 25, piercing: true } },
-    drillTorso: { name: 'Panzer-Torso', type: PART_TYPES.TORSO, tier: 1, stats: { hp: 30, armor: 10 } },
+    // ARM PARTS
+    rustyArm: { 
+        name: 'Rost-Arm', 
+        type: PART_TYPES.RIGHT_ARM, 
+        tier: 1, 
+        stats: { damage: 5, range: 30 }, 
+        gridShape: 'standardArm' 
+    },
+    drillArm: { 
+        name: 'Bohrer-Arm', 
+        type: PART_TYPES.RIGHT_ARM, 
+        tier: 1, 
+        stats: { damage: 10, range: 25, piercing: true }, 
+        gridShape: 'booster' 
+    },
+    laserArm: { 
+        name: 'Laser-Kanone', 
+        type: PART_TYPES.RIGHT_ARM, 
+        tier: 2, 
+        stats: { damage: 15, range: 100 }, 
+        gridShape: 'laserCannon' 
+    },
+    shieldArm: { 
+        name: 'Schild-Arm', 
+        type: PART_TYPES.LEFT_ARM, 
+        tier: 2, 
+        stats: { damage: 5, block: 20 }, 
+        gridShape: 'sensor' 
+    },
+    bladeArm: { 
+        name: 'Klingen-Arm', 
+        type: PART_TYPES.RIGHT_ARM, 
+        tier: 2, 
+        stats: { damage: 12, range: 35, combo: 3 }, 
+        gridShape: 'booster' 
+    },
+    rocketArm: { 
+        name: 'Raketen-Werfer', 
+        type: PART_TYPES.RIGHT_ARM, 
+        tier: 3, 
+        stats: { damage: 25, range: 120, explosive: true }, 
+        gridShape: 'bigL' 
+    },
+    heavyArm: { 
+        name: 'Hammer-Faust', 
+        type: PART_TYPES.RIGHT_ARM, 
+        tier: 3, 
+        stats: { damage: 30, range: 40 }, 
+        gridShape: 'bigL' 
+    },
 
-    // Tier 2 - Industrie-Bots
-    laserHead: { name: 'Laser-Visier', type: PART_TYPES.HEAD, tier: 2, stats: { vision: 15, special: 10, autoAim: true } },
-    laserArm: { name: 'Laser-Kanone', type: PART_TYPES.RIGHT_ARM, tier: 2, stats: { damage: 15, range: 100 } },
+    // LEG PARTS
+    rustyLegs: { 
+        name: 'Rost-Beine', 
+        type: PART_TYPES.LEGS, 
+        tier: 1, 
+        stats: { speed: 2, jump: 8 }, 
+        gridShape: 'sensor' 
+    },
+    sparkLegs: { 
+        name: 'Sprung-Beine', 
+        type: PART_TYPES.LEGS, 
+        tier: 1, 
+        stats: { speed: 4, jump: 12 }, 
+        gridShape: 'booster' 
+    },
+    bladeLegs: { 
+        name: 'Sprint-Beine', 
+        type: PART_TYPES.LEGS, 
+        tier: 2, 
+        stats: { speed: 6, jump: 10 }, 
+        gridShape: 'sensor' 
+    },
+    stealthLegs: { 
+        name: 'Lautlos-Beine', 
+        type: PART_TYPES.LEGS, 
+        tier: 3, 
+        stats: { speed: 5, jump: 10, silent: true }, 
+        gridShape: 'booster' 
+    },
+    heavyLegs: { 
+        name: 'Stampfer-Beine', 
+        type: PART_TYPES.LEGS, 
+        tier: 3, 
+        stats: { speed: 1, jump: 6 }, 
+        gridShape: 'sensor' 
+    },
 
-    shieldArm: { name: 'Schild-Arm', type: PART_TYPES.LEFT_ARM, tier: 2, stats: { damage: 5, block: 20 } },
-    shieldBack: { name: 'Schild-Modul', type: PART_TYPES.BACK, tier: 2, stats: { shield: 30 } },
-
-    bladeArm: { name: 'Klingen-Arm', type: PART_TYPES.RIGHT_ARM, tier: 2, stats: { damage: 12, range: 35, combo: 3 } },
-    bladeTorso: { name: 'Leicht-Torso', type: PART_TYPES.TORSO, tier: 2, stats: { hp: 25, armor: 5 } },
-    bladeLegs: { name: 'Sprint-Beine', type: PART_TYPES.LEGS, tier: 2, stats: { speed: 6, jump: 10 } },
-
-    // Tier 3 - Militär-Bots
-    rocketArm: { name: 'Raketen-Werfer', type: PART_TYPES.RIGHT_ARM, tier: 3, stats: { damage: 25, range: 120, explosive: true } },
-    rocketBack: { name: 'Munitions-Modul', type: PART_TYPES.BACK, tier: 3, stats: { ammo: 50 } },
-
-    stealthHead: { name: 'Tarn-Kopf', type: PART_TYPES.HEAD, tier: 3, stats: { vision: 12, special: 20, stealth: true } },
-    stealthLegs: { name: 'Lautlos-Beine', type: PART_TYPES.LEGS, tier: 3, stats: { speed: 5, jump: 10, silent: true } },
-    stealthBack: { name: 'Tarn-Feld', type: PART_TYPES.BACK, tier: 3, stats: { stealth: 5 } },
-
-    heavyTorso: { name: 'Panzer-Koloss', type: PART_TYPES.TORSO, tier: 3, stats: { hp: 60, armor: 25 } },
-    heavyArm: { name: 'Hammer-Faust', type: PART_TYPES.RIGHT_ARM, tier: 3, stats: { damage: 30, range: 40 } },
-    heavyLegs: { name: 'Stampfer-Beine', type: PART_TYPES.LEGS, tier: 3, stats: { speed: 1, jump: 6 } }
+    // BACK PARTS
+    shieldBack: { 
+        name: 'Schild-Modul', 
+        type: PART_TYPES.BACK, 
+        tier: 2, 
+        stats: { shield: 30 }, 
+        gridShape: 'tinyBlock' 
+    },
+    rocketBack: { 
+        name: 'Munitions-Modul', 
+        type: PART_TYPES.BACK, 
+        tier: 3, 
+        stats: { ammo: 50 }, 
+        gridShape: 'tinyBlock' 
+    },
+    stealthBack: { 
+        name: 'Tarn-Feld', 
+        type: PART_TYPES.BACK, 
+        tier: 3, 
+        stats: { stealth: 5 }, 
+        gridShape: 'tinyBlock' 
+    }
 };
 
 // Combination recipes
 const COMBINATIONS = {
-    // Super parts (3 same parts)
     'rustyArm+rustyArm+rustyArm': {
         result: 'superRustyArm',
         name: 'Super-Schrott-Arm',
         type: PART_TYPES.RIGHT_ARM,
         rarity: RARITY.SUPER,
-        stats: { damage: 8, range: 45 } // +50% of base
+        stats: { damage: 8, range: 45 },
+        gridShape: 'bigL'
     },
     'drillArm+drillArm+drillArm': {
         result: 'superDrillArm',
         name: 'Bohrer-Faust',
         type: PART_TYPES.RIGHT_ARM,
         rarity: RARITY.SUPER,
-        stats: { damage: 15, range: 38, piercing: true, shieldBreak: true }
+        stats: { damage: 15, range: 38, piercing: true, shieldBreak: true },
+        gridShape: 'laserCannon'
     },
     'sparkLegs+sparkLegs+sparkLegs': {
         result: 'superSparkLegs',
         name: 'Hyper-Springer',
         type: PART_TYPES.LEGS,
         rarity: RARITY.SUPER,
-        stats: { speed: 6, jump: 18, doubleJump: true }
-    },
-    'laserArm+laserArm+rocketArm': {
-        result: 'plasmaCannon',
-        name: 'Plasma-Kanone',
-        type: PART_TYPES.RIGHT_ARM,
-        rarity: RARITY.SUPER,
-        stats: { damage: 20, range: 110, explosive: true, burn: true }
-    },
-    'stealthHead+stealthLegs+stealthBack': {
-        result: 'phantomModule',
-        name: 'Phantom-Modul',
-        type: PART_TYPES.BACK,
-        rarity: RARITY.SUPER,
-        stats: { stealth: 10, invisibilityDuration: 5 }
-    },
-
-    // Mega parts (2-3 super parts)
-    'superRustyArm+superRustyArm+superDrillArm': {
-        result: 'titanUpperBody',
-        name: 'TITAN-OBERKÖRPER',
-        type: PART_TYPES.TORSO,
-        rarity: RARITY.MEGA,
-        stats: { hp: 100, armor: 30, damage: 25, range: 50 }
-    },
-    'superSparkLegs+phantomModule': {
-        result: 'jetpackDrive',
-        name: 'JETPACK-ANTRIEB',
-        type: PART_TYPES.BACK,
-        rarity: RARITY.MEGA,
-        stats: { speed: 8, jump: 25, flight: true, stealth: 5 }
+        stats: { speed: 6, jump: 18, doubleJump: true },
+        gridShape: 'longBar'
     }
 };
 
+// ============================================
+// UNIFIED PART CLASS
+// ============================================
+
 class Part {
-    constructor(partKey, rarity = RARITY.COMMON, isPermanent = false) {
+    constructor(partKey, rarity = RARITY.COMMON, rotation = 0) {
         const def = PART_DEFINITIONS[partKey];
         if (!def) {
             console.error('Unknown part:', partKey);
             return;
         }
 
+        // Core properties
         this.id = Date.now() + Math.random();
         this.key = partKey;
         this.name = def.name;
         this.type = def.type;
         this.tier = def.tier;
         this.rarity = rarity;
-        this.isPermanent = isPermanent;
+        this.isPermanent = false;
         this.stats = { ...def.stats };
 
-        // Apply rarity multiplier
+        // Grid properties
+        this.gridShape = def.gridShape || 'chip';
+        this.shape = this.rotateShape(GRID_SHAPES[this.gridShape] || [[1]], rotation);
+        this.originalShape = GRID_SHAPES[this.gridShape] || [[1]];
+        this.rotation = rotation;
+        this.gridX = null;
+        this.gridY = null;
+        this.bodyPart = null;
+
         this.applyRarityBonus();
     }
 
@@ -152,7 +301,6 @@ class Part {
 
         const mult = multipliers[this.rarity] || 1.0;
 
-        // Multiply numeric stats
         for (let stat in this.stats) {
             if (typeof this.stats[stat] === 'number') {
                 this.stats[stat] = Math.floor(this.stats[stat] * mult);
@@ -160,18 +308,71 @@ class Part {
         }
     }
 
+    rotateShape(shape, rotations) {
+        let rotated = JSON.parse(JSON.stringify(shape));
+        for (let i = 0; i < rotations; i++) {
+            rotated = this.rotate90(rotated);
+        }
+        return rotated;
+    }
+
+    rotate90(shape) {
+        const rows = shape.length;
+        const cols = shape[0].length;
+        const rotated = [];
+
+        for (let c = 0; c < cols; c++) {
+            rotated[c] = [];
+            for (let r = rows - 1; r >= 0; r--) {
+                rotated[c][rows - 1 - r] = shape[r][c];
+            }
+        }
+        return rotated;
+    }
+
+    rotate() {
+        this.rotation = (this.rotation + 1) % 4;
+        this.shape = this.rotateShape(this.originalShape, this.rotation);
+    }
+
+    getWidth() {
+        return this.shape[0].length;
+    }
+
+    getHeight() {
+        return this.shape.length;
+    }
+
+    getSize() {
+        let size = 0;
+        for (let row of this.shape) {
+            for (let cell of row) {
+                if (cell === 1) size++;
+            }
+        }
+        return size;
+    }
+
     getRarityColor() {
         const colors = {
-            [RARITY.COMMON]: '#888',
+            [RARITY.COMMON]: '#888888',
             [RARITY.UNCOMMON]: '#00ff00',
             [RARITY.RARE]: '#0088ff',
             [RARITY.EPIC]: '#aa00ff',
             [RARITY.SUPER]: '#ffaa00',
             [RARITY.MEGA]: '#ff00ff'
         };
-        return colors[this.rarity] || '#888';
+        return colors[this.rarity] || '#888888';
+    }
+
+    clone() {
+        return new Part(this.key, this.rarity, this.rotation);
     }
 }
+
+// ============================================
+// PARTS MANAGER
+// ============================================
 
 class PartsManager {
     static rollRarity() {
@@ -189,7 +390,6 @@ class PartsManager {
     }
 
     static createRandomPart(enemyType, forcePermanent = false) {
-        // Get parts that match enemy type (simplified - you can expand this)
         const possibleParts = Object.keys(PART_DEFINITIONS).filter(key => {
             const def = PART_DEFINITIONS[key];
             if (enemyType === 'tier1') return def.tier === 1;
@@ -201,15 +401,14 @@ class PartsManager {
         const partKey = possibleParts[Math.floor(Math.random() * possibleParts.length)];
         const rarity = forcePermanent ? RARITY.RARE : this.rollRarity();
 
-        return new Part(partKey, rarity, forcePermanent);
+        return new Part(partKey, rarity);
     }
 
-    static tryCombinatione(parts) {
+    static tryCombine(parts) {
         if (!parts || parts.length < 2 || parts.length > 3) {
             return null;
         }
 
-        // Sort parts by key to match recipes
         const sortedKeys = parts.map(p => p.key).sort();
         const recipeKey = sortedKeys.join('+');
 
@@ -218,22 +417,11 @@ class PartsManager {
             return null;
         }
 
-        // Create combined part
-        const combined = {
-            id: Date.now() + Math.random(),
-            key: recipe.result,
-            name: recipe.name,
-            type: recipe.type,
-            rarity: recipe.rarity,
-            stats: { ...recipe.stats },
-            isPermanent: parts.every(p => p.isPermanent)
-        };
+        const combined = new Part(recipe.result, recipe.rarity);
+        combined.name = recipe.name;
+        combined.stats = { ...recipe.stats };
+        combined.isPermanent = parts.every(p => p.isPermanent);
 
         return combined;
     }
-}
-
-// Export for use in other modules
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { PART_TYPES, RARITY, Part, PartsManager, PART_DEFINITIONS, COMBINATIONS };
 }
