@@ -1,0 +1,128 @@
+{
+  "combinations": [
+    {
+      "id": "super_rusty_arm",
+      "recipe": ["rustyArm", "rustyArm", "rustyArm"],
+      "result": {
+        "key": "superRustyArm",
+        "name": "Super-Schrott-Arm",
+        "type": "rightArm",
+        "rarity": "super",
+        "stats": {
+          "damage": 8,
+          "range": 45
+        }
+      }
+    },
+    {
+      "id": "super_drill_arm",
+      "recipe": ["drillArm", "drillArm", "drillArm"],
+      "result": {
+        "key": "superDrillArm",
+        "name": "Bohrer-Faust",
+        "type": "rightArm",
+        "rarity": "super",
+        "stats": {
+          "damage": 15,
+          "range": 38,
+          "piercing": true,
+          "shieldBreak": true
+        }
+      }
+    },
+    {
+      "id": "hyper_springer",
+      "recipe": ["sparkLegs", "sparkLegs", "sparkLegs"],
+      "result": {
+        "key": "superSparkLegs",
+        "name": "Hyper-Springer",
+        "type": "legs",
+        "rarity": "super",
+        "stats": {
+          "speed": 6,
+          "jump": 18,
+          "doubleJump": true
+        }
+      }
+    },
+    {
+      "id": "plasma_cannon",
+      "recipe": ["laserArm", "laserArm", "rocketArm"],
+      "result": {
+        "key": "plasmaCannon",
+        "name": "Plasma-Kanone",
+        "type": "rightArm",
+        "rarity": "super",
+        "stats": {
+          "damage": 20,
+          "range": 110,
+          "explosive": true,
+          "burn": true
+        }
+      }
+    },
+    {
+      "id": "phantom_module",
+      "recipe": ["stealthHead", "stealthLegs", "stealthBack"],
+      "result": {
+        "key": "phantomModule",
+        "name": "Phantom-Modul",
+        "type": "back",
+        "rarity": "super",
+        "stats": {
+          "stealth": 10,
+          "invisibilityDuration": 5
+        }
+      }
+    },
+    {
+      "id": "titan_upperbody",
+      "recipe": ["superRustyArm", "superRustyArm", "superDrillArm"],
+      "result": {
+        "key": "titanUpperBody",
+        "name": "TITAN-OBERKÖRPER",
+        "type": "torso",
+        "rarity": "mega",
+        "stats": {
+          "hp": 100,
+          "armor": 30,
+          "damage": 25,
+          "range": 50
+        }
+      }
+    },
+    {
+      "id": "jetpack_drive",
+      "recipe": ["superSparkLegs", "phantomModule"],
+      "result": {
+        "key": "jetpackDrive",
+        "name": "JETPACK-ANTRIEB",
+        "type": "back",
+        "rarity": "mega",
+        "stats": {
+          "speed": 8,
+          "jump": 25,
+          "flight": true,
+          "stealth": 5
+        }
+      }
+    }
+  ],
+  "achievements": [
+    {
+      "id": "first_super_part",
+      "name": "Erstes Megateil erstellt",
+      "description": "Erstelle dein erstes Superteil durch Kombination"
+    },
+    {
+      "id": "boss_no_damage",
+      "name": "Boss ohne Schaden besiegt",
+      "description": "Besiege einen Boss ohne Schaden zu nehmen"
+    },
+    {
+      "id": "all_combinations",
+      "name": "Alle Kombinationen entdeckt",
+      "description": "Entdecke alle möglichen Teilkombinationen"
+    }
+  ]
+}

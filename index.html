@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Scrap Rising - Mobile Mecha Platformer</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- HUD Overlay -->
+        <div id="hud">
+            <div class="hud-top">
+                <div class="health-bar">
+                    <div class="bar-label">HP</div>
+                    <div class="bar-container">
+                        <div id="playerHealthBar" class="bar-fill"></div>
+                    </div>
+                </div>
+                <div class="boss-health" id="bossHealth" style="display: none;">
+                    <div class="bar-label">BOSS</div>
+                    <div class="bar-container">
+                        <div id="bossHealthBar" class="bar-fill boss"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="hud-info">
+                <div id="energyDisplay">ENERGIE: <span id="energyValue">100</span></div>
+                <div id="partsDisplay">TEILE: <span id="partsValue">0/6</span></div>
+            </div>
+        </div>
+
+        <!-- Inventory Screen (hidden by default) -->
+        <div id="inventoryScreen" class="screen-overlay" style="display: none;">
+            <div class="inventory-container">
+                <h2>INVENTAR</h2>
+                <div class="inventory-filters">
+                    <button class="filter-btn active" data-filter="all">ALLE</button>
+                    <button class="filter-btn" data-filter="temporary">TEMPORÄR</button>
+                    <button class="filter-btn" data-filter="permanent">PERMANENT</button>
+                </div>
+
+                <div class="equipped-section">
+                    <h3>AUSGERÜSTET</h3>
+                    <div class="equipped-grid">
+                        <div class="equip-slot" data-slot="head">
+                            <div class="slot-label">KOPF</div>
+                            <div class="slot-content" id="equip-head"></div>
+                        </div>
+                        <div class="equip-slot" data-slot="torso">
+                            <div class="slot-label">TORSO</div>
+                            <div class="slot-content" id="equip-torso"></div>
+                        </div>
+                        <div class="equip-slot" data-slot="leftArm">
+                            <div class="slot-label">L-ARM</div>
+                            <div class="slot-content" id="equip-leftArm"></div>
+                        </div>
+                        <div class="equip-slot" data-slot="rightArm">
+                            <div class="slot-label">R-ARM</div>
+                            <div class="slot-content" id="equip-rightArm"></div>
+                        </div>
+                        <div class="equip-slot" data-slot="legs">
+                            <div class="slot-label">BEINE</div>
+                            <div class="slot-content" id="equip-legs"></div>
+                        </div>
+                        <div class="equip-slot" data-slot="back">
+                            <div class="slot-label">RÜCKEN</div>
+                            <div class="slot-content" id="equip-back"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="inventory-section">
+                    <h3>GESAMMELTE TEILE</h3>
+                    <div id="inventoryGrid" class="inventory-grid"></div>
+                </div>
+
+                <div class="combination-section">
+                    <h3>KOMBINATION</h3>
+                    <div class="combo-area">
+                        <div class="combo-slots">
+                            <div class="combo-slot" id="combo-slot-1"></div>
+                            <div class="combo-slot" id="combo-slot-2"></div>
+                            <div class="combo-slot" id="combo-slot-3"></div>
+                        </div>
+                        <div class="combo-arrow">→</div>
+                        <div class="combo-result" id="combo-result"></div>
+                    </div>
+                    <button id="combineBtn" class="combine-btn" disabled>KOMBINIEREN</button>
+                </div>
+
+                <button id="closeInventory" class="close-btn">SCHLIESSEN</button>
+            </div>
+        </div>
+
+        <!-- Touch Controls -->
+        <div id="touchControls">
+            <div class="dpad-container">
+                <button class="control-btn dpad-btn" id="btnLeft" data-action="left">◀</button>
+                <button class="control-btn dpad-btn" id="btnRight" data-action="right">▶</button>
+            </div>
+            <div class="action-container">
+                <button class="control-btn action-btn" id="btnJump" data-action="jump">↑</button>
+                <button class="control-btn action-btn" id="btnAttack" data-action="attack">⚔</button>
+                <button class="control-btn special-btn" id="btnSpecial" data-action="special">✦</button>
+                <button class="control-btn inv-btn" id="btnInventory" data-action="inventory">⚙</button>
+            </div>
+        </div>
+
+        <!-- Start Screen -->
+        <div id="startScreen" class="screen-overlay">
+            <div class="start-container">
+                <h1>SCRAP RISING</h1>
+                <p class="tagline">Baue deinen Mecha aus Feindteilen!</p>
+                <button id="startBtn" class="start-btn">SPIEL STARTEN</button>
+                <div class="instructions">
+                    <h3>STEUERUNG:</h3>
+                    <p>◀▶ Bewegung | ↑ Springen | ⚔ Angreifen</p>
+                    <p>✦ Spezialfähigkeit | ⚙ Inventar</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="gameOverScreen" class="screen-overlay" style="display: none;">
+            <div class="gameover-container">
+                <h1>GAME OVER</h1>
+                <p id="gameOverMessage"></p>
+                <button id="restartBtn" class="start-btn">NEUSTART</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Scripts -->
+    <script src="js/parts.js"></script>
+    <script src="js/inventory.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/enemies.js"></script>
+    <script src="js/boss.js"></script>
+    <script src="js/levels.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
