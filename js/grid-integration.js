@@ -28,8 +28,64 @@ class GridInventoryManager {
             this.synergyManager,
             this.rotationManager
         );
+        this.touchManager = new TouchManager(this.gridManager);
+        this.touchManager.init();
+
+        // Add context menu for removing parts
+        this.setupPartRemoval();
 
         this.setupEventHandlers();
+    }
+
+    setupPartRemoval() {
+        const canvas = this.gridManager.canvas;
+
+        // Right-click to remove part
+        canvas.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            const gridPos = this.gridManager.canvasToGrid(e.clientX, e.clientY);
+            if (gridPos) {
+                const part = this.gridManager.isSlotOccupied(gridPos.x, gridPos.y);
+                if (part) {
+                    this.gridManager.removePart(part);
+                    this.updateAllGridFills();
+                    this.updateAvailableParts();
+                    this.updateSynergies();
+                    this.inventory.updateUI(); // Update classic view
+                }
+            }
+        });
+
+        // Long press to remove part (mobile)
+        let longPressTimer;
+        canvas.addEventListener('touchstart', (e) => {
+            const touch = e.touches[0];
+            longPressTimer = setTimeout(() => {
+                const gridPos = this.gridManager.canvasToGrid(touch.clientX, touch.clientY);
+                if (gridPos) {
+                    const part = this.gridManager.isSlotOccupied(gridPos.x, gridPos.y);
+                    if (part) {
+                        // Vibrate if available
+                        if (navigator.vibrate) {
+                            navigator.vibrate(50);
+                        }
+                        this.gridManager.removePart(part);
+                        this.updateAllGridFills();
+                        this.updateAvailableParts();
+                        this.updateSynergies();
+                        this.inventory.updateUI();
+                    }
+                }
+            }, 500); // 500ms long press
+        });
+
+        canvas.addEventListener('touchend', () => {
+            clearTimeout(longPressTimer);
+        });
+
+        canvas.addEventListener('touchmove', () => {
+            clearTimeout(longPressTimer);
+        });
     }
 
     setupEventHandlers() {
@@ -89,6 +145,9 @@ class GridInventoryManager {
             oldView.style.display = 'block';
             gridView.style.display = 'none';
             gridViewBtn.textContent = '🎮 GRID-ANSICHT';
+
+            // Update classic inventory to reflect grid changes
+            this.inventory.updateUI();
         }
     }
 

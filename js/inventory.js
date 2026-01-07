@@ -218,6 +218,15 @@ class Inventory {
             filteredParts = this.parts.filter(p => p.isPermanent);
         }
 
+        // Filter out parts that are already placed in grid system
+        if (window.gridInventoryManager && window.gridInventoryManager.gridManager) {
+            filteredParts = filteredParts.filter(part => {
+                const isInGrid = Object.values(window.gridInventoryManager.gridManager.placedParts)
+                    .some(bodyParts => bodyParts.some(p => p.id === part.id));
+                return !isInGrid;
+            });
+        }
+
         grid.innerHTML = '';
 
         filteredParts.forEach(part => {
