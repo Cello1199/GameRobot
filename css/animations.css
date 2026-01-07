@@ -1,0 +1,423 @@
+/* Animation Styles for Grid Inventory System */
+
+/* Slide Down (for toast) */
+@keyframes slideDown {
+    from {
+        transform: translateX(-50%) translateY(-100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Fade In */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Fade Out */
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* Pulse (for synergy glow) */
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 10px var(--synergy-gold);
+        border-color: var(--synergy-gold);
+    }
+    50% {
+        box-shadow: 0 0 30px var(--synergy-gold), 0 0 50px var(--synergy-gold);
+        border-color: #fff;
+    }
+}
+
+/* Shake (for invalid placement) */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* Glow (for highlighted slots) */
+@keyframes glow {
+    0%, 100% {
+        box-shadow: 0 0 5px var(--valid-green);
+    }
+    50% {
+        box-shadow: 0 0 20px var(--valid-green), 0 0 30px var(--valid-green);
+    }
+}
+
+/* Rotate (for rotating parts) */
+@keyframes rotate360 {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Bounce (for part placement) */
+@keyframes bounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+/* Slide In From Right */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Slide Out To Right */
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Pop In (for grid slots expanding) */
+@keyframes popIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Sparkle (for legendary items) */
+@keyframes sparkle {
+    0%, 100% {
+        box-shadow:
+            0 0 10px var(--rarity-legendary),
+            2px 2px 15px var(--rarity-legendary),
+            -2px -2px 15px var(--rarity-legendary);
+    }
+    25% {
+        box-shadow:
+            0 0 20px var(--rarity-legendary),
+            5px -5px 20px var(--rarity-legendary),
+            -5px 5px 20px var(--rarity-legendary);
+    }
+    50% {
+        box-shadow:
+            0 0 15px var(--rarity-legendary),
+            -5px 5px 20px var(--rarity-legendary),
+            5px -5px 20px var(--rarity-legendary);
+    }
+    75% {
+        box-shadow:
+            0 0 25px var(--rarity-legendary),
+            -5px -5px 20px var(--rarity-legendary),
+            5px 5px 20px var(--rarity-legendary);
+    }
+}
+
+/* Overload Warning (red pulsing) */
+@keyframes overloadWarning {
+    0%, 100% {
+        border-color: var(--invalid-red);
+        box-shadow: 0 0 10px var(--invalid-red);
+    }
+    50% {
+        border-color: #ff3366;
+        box-shadow: 0 0 30px var(--invalid-red), 0 0 50px var(--invalid-red);
+        transform: scale(1.02);
+    }
+}
+
+/* Lightning (for synergy activation) */
+@keyframes lightning {
+    0%, 90%, 100% { opacity: 0; }
+    95% { opacity: 1; }
+}
+
+/* Float (for dragging parts) */
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+}
+
+/* === Applied Animation Classes === */
+
+.animate-pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.animate-shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+.animate-glow {
+    animation: glow 1.5s ease-in-out infinite;
+}
+
+.animate-bounce {
+    animation: bounce 0.3s ease-out;
+}
+
+.animate-rotate {
+    animation: rotate360 0.3s ease-out;
+}
+
+.animate-fadein {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.animate-fadeout {
+    animation: fadeOut 0.3s ease-out;
+}
+
+.animate-slidein {
+    animation: slideInRight 0.3s ease-out;
+}
+
+.animate-slideout {
+    animation: slideOutRight 0.3s ease-out;
+}
+
+.animate-popin {
+    animation: popIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.animate-sparkle {
+    animation: sparkle 2s ease-in-out infinite;
+}
+
+.animate-overload {
+    animation: overloadWarning 1s ease-in-out infinite;
+}
+
+.animate-float {
+    animation: float 2s ease-in-out infinite;
+}
+
+/* Canvas-specific animations (applied via JS) */
+.grid-slot-highlight {
+    transition: all 0.2s ease-out;
+}
+
+.grid-slot-invalid {
+    filter: brightness(1.5);
+}
+
+.part-dragging {
+    opacity: 0.7;
+    cursor: grabbing !important;
+}
+
+/* Particle effects (when parts are placed/removed) */
+.particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: var(--border-primary);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: particleFly 0.8s ease-out forwards;
+}
+
+@keyframes particleFly {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--tx), var(--ty)) scale(0);
+        opacity: 0;
+    }
+}
+
+/* Synergy line effect (drawn between parts) */
+.synergy-line {
+    position: absolute;
+    height: 2px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        var(--synergy-gold) 50%,
+        transparent 100%);
+    pointer-events: none;
+    animation: synergyPulse 1.5s ease-in-out infinite;
+    box-shadow: 0 0 10px var(--synergy-gold);
+}
+
+@keyframes synergyPulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+/* Grid expansion animation */
+.grid-expanding {
+    animation: gridExpand 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes gridExpand {
+    0% {
+        transform: scale(0.9);
+        opacity: 0.5;
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Lock/Unlock slot animation */
+.slot-unlock {
+    animation: slotUnlock 0.6s ease-out;
+}
+
+@keyframes slotUnlock {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+        filter: brightness(3);
+    }
+    60% {
+        transform: scale(1.2);
+        filter: brightness(2);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+        filter: brightness(1);
+    }
+}
+
+/* Touch ripple effect */
+.touch-ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(0, 255, 255, 0.4);
+    pointer-events: none;
+    animation: ripple 0.6s ease-out;
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Part shimmer (for rare parts in inventory) */
+.part-shimmer {
+    position: relative;
+    overflow: hidden;
+}
+
+.part-shimmer::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.3) 50%,
+        transparent 70%
+    );
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+}
+
+/* Hover lift effect */
+.hover-lift {
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+
+.hover-lift:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 255, 255, 0.4);
+}
+
+/* Loading spinner */
+.spinner {
+    border: 3px solid rgba(0, 255, 255, 0.2);
+    border-top: 3px solid var(--border-primary);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Success checkmark animation */
+.checkmark {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: block;
+    stroke-width: 3;
+    stroke: var(--valid-green);
+    stroke-miterlimit: 10;
+    box-shadow: inset 0px 0px 0px var(--valid-green);
+    animation: checkmarkFill 0.4s ease-in-out 0.4s forwards,
+               checkmarkScale 0.3s ease-in-out 0.9s both;
+}
+
+.checkmark-circle {
+    stroke-dasharray: 166;
+    stroke-dashoffset: 166;
+    stroke-width: 2;
+    stroke-miterlimit: 10;
+    stroke: var(--valid-green);
+    fill: none;
+    animation: checkmarkStroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.checkmark-check {
+    transform-origin: 50% 50%;
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    animation: checkmarkStroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+}
+
+@keyframes checkmarkStroke {
+    100% { stroke-dashoffset: 0; }
+}
+
+@keyframes checkmarkScale {
+    0%, 100% { transform: none; }
+    50% { transform: scale3d(1.1, 1.1, 1); }
+}
+
+@keyframes checkmarkFill {
+    100% { box-shadow: inset 0px 0px 0px 30px var(--valid-green); }
+}
