@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Grid Inventory System - Prototype</title>
+    <link rel="stylesheet" href="css/inventory.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Main Container -->
+        <div id="mainContainer">
+            <!-- Header -->
+            <header id="header">
+                <button id="backBtn" class="header-btn">←</button>
+                <h1 id="headerTitle">AUSRÜSTUNG</h1>
+                <button id="autoFitBtn" class="header-btn primary">AUTO-FIT</button>
+            </header>
+
+            <!-- Body Overview (Character Silhouette View) -->
+            <div id="bodyOverview" class="view-container">
+                <div class="body-silhouette">
+                    <div class="body-part-btn" data-part="head">
+                        <div class="part-icon">👤</div>
+                        <span>KOPF</span>
+                        <div class="part-fill" data-fill="head">0/4</div>
+                    </div>
+
+                    <div class="body-row">
+                        <div class="body-part-btn" data-part="leftArm">
+                            <div class="part-icon">💪</div>
+                            <span>L-ARM</span>
+                            <div class="part-fill" data-fill="leftArm">0/6</div>
+                        </div>
+
+                        <div class="body-part-btn" data-part="torso">
+                            <div class="part-icon">🛡️</div>
+                            <span>TORSO</span>
+                            <div class="part-fill" data-fill="torso">0/9</div>
+                        </div>
+
+                        <div class="body-part-btn" data-part="rightArm">
+                            <div class="part-icon">💪</div>
+                            <span>R-ARM</span>
+                            <div class="part-fill" data-fill="rightArm">0/6</div>
+                        </div>
+                    </div>
+
+                    <div class="body-part-btn" data-part="back">
+                        <div class="part-icon">🎒</div>
+                        <span>RÜCKEN</span>
+                        <div class="part-fill" data-fill="back">0/8</div>
+                    </div>
+
+                    <div class="body-part-btn" data-part="legs">
+                        <div class="part-icon">🦿</div>
+                        <span>BEINE</span>
+                        <div class="part-fill" data-fill="legs">0/6</div>
+                    </div>
+                </div>
+
+                <!-- Stats Display -->
+                <div class="stats-panel">
+                    <h3>GESAMTSTATS</h3>
+                    <div class="stat-row">
+                        <span>HP:</span>
+                        <div class="stat-bar"><div class="stat-fill" id="stat-hp" style="width: 50%">50</div></div>
+                    </div>
+                    <div class="stat-row">
+                        <span>Schaden:</span>
+                        <div class="stat-bar"><div class="stat-fill" id="stat-damage" style="width: 30%">30</div></div>
+                    </div>
+                    <div class="stat-row">
+                        <span>Rüstung:</span>
+                        <div class="stat-bar"><div class="stat-fill" id="stat-armor" style="width: 20%">20</div></div>
+                    </div>
+                    <div class="stat-row">
+                        <span>Speed:</span>
+                        <div class="stat-bar"><div class="stat-fill" id="stat-speed" style="width: 40%">40</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grid Detail View (Single Body Part) -->
+            <div id="gridView" class="view-container" style="display: none;">
+                <div class="grid-header">
+                    <h2 id="gridTitle">TORSO GRID</h2>
+                    <div class="grid-controls">
+                        <button id="rotateBtn" class="control-btn">
+                            <span class="rotate-icon">↻</span> 90°
+                        </button>
+                        <button id="removePartBtn" class="control-btn danger">
+                            <span>✕</span> ENTFERNEN
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Canvas for Grid -->
+                <div class="canvas-container">
+                    <canvas id="gridCanvas"></canvas>
+                </div>
+
+                <!-- Part Info Panel -->
+                <div class="part-info-panel">
+                    <div id="selectedPartInfo" style="display: none;">
+                        <h3 id="partName">Teil-Name</h3>
+                        <div class="part-stats" id="partStats"></div>
+                        <div class="part-synergies" id="partSynergies"></div>
+                    </div>
+                    <div id="placementHint" class="hint-text">
+                        Wähle ein Teil aus dem Inventar zum Platzieren
+                    </div>
+                </div>
+
+                <!-- Synergies Display -->
+                <div class="synergies-active" id="synergiesActive">
+                    <h4>AKTIVE SYNERGIEN:</h4>
+                    <div id="synergyList"></div>
+                </div>
+            </div>
+
+            <!-- Bottom Inventory Bar -->
+            <div id="inventoryBar">
+                <div class="inventory-header">
+                    <h3>INVENTAR (Nicht ausgerüstet)</h3>
+                    <div class="inventory-controls">
+                        <select id="filterSelect" class="filter-select">
+                            <option value="all">Alle</option>
+                            <option value="head">Kopf</option>
+                            <option value="torso">Torso</option>
+                            <option value="arms">Arme</option>
+                            <option value="legs">Beine</option>
+                            <option value="back">Rücken</option>
+                        </select>
+                        <select id="sortSelect" class="filter-select">
+                            <option value="name">Name</option>
+                            <option value="rarity">Seltenheit</option>
+                            <option value="size">Größe</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="inventory-scroll">
+                    <div id="inventoryGrid" class="inventory-parts">
+                        <!-- Parts will be dynamically added here -->
+                    </div>
+                </div>
+
+                <div class="inventory-pagination">
+                    <button id="prevPage" class="page-btn">←</button>
+                    <span id="pageInfo">Seite 1/1</span>
+                    <button id="nextPage" class="page-btn">→</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tooltips and Modals -->
+        <div id="tooltip" class="tooltip" style="display: none;"></div>
+
+        <!-- Notification Toast -->
+        <div id="notificationToast" class="toast" style="display: none;">
+            <span id="toastMessage"></span>
+        </div>
+
+        <!-- Debug Panel (for development) -->
+        <div id="debugPanel" class="debug-panel">
+            <h4>DEBUG</h4>
+            <div id="debugInfo">
+                Mouse: <span id="debugMouse">0, 0</span><br>
+                Selected: <span id="debugSelected">None</span><br>
+                Valid: <span id="debugValid">-</span>
+            </div>
+            <button id="toggleDebug">Hide Debug</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/parts.js"></script>
+    <script src="js/rotation.js"></script>
+    <script src="js/grid.js"></script>
+    <script src="js/placement.js"></script>
+    <script src="js/synergy.js"></script>
+    <script src="js/autofit.js"></script>
+    <script src="js/expansion.js"></script>
+    <script src="js/touch.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

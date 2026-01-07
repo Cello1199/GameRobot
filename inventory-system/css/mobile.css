@@ -1,0 +1,471 @@
+/* Mobile-Specific Styles for Grid Inventory System */
+
+/* Touch optimizations */
+@media (max-width: 768px) {
+    :root {
+        --slot-size: 35px;
+        --slot-gap: 1px;
+    }
+
+    /* Larger touch targets */
+    .body-part-btn {
+        min-width: 100px;
+        padding: 12px;
+    }
+
+    .part-icon {
+        font-size: 28px;
+    }
+
+    .control-btn,
+    .header-btn {
+        padding: 10px 14px;
+        font-size: 13px;
+        min-width: 44px; /* iOS minimum touch target */
+        min-height: 44px;
+    }
+
+    /* Adjust grid for smaller screens */
+    .canvas-container {
+        padding: 10px;
+        min-height: 300px;
+    }
+
+    /* Inventory bar adjustments */
+    #inventoryBar {
+        max-height: 200px;
+        padding: 10px;
+    }
+
+    .inventory-item {
+        min-width: 70px;
+        padding: 8px;
+    }
+
+    .item-shape-preview {
+        width: 50px;
+        height: 50px;
+    }
+
+    /* Simplify stats panel on mobile */
+    .stats-panel {
+        padding: 10px;
+    }
+
+    .stat-row {
+        font-size: 11px;
+    }
+
+    .stat-row span {
+        min-width: 60px;
+    }
+
+    /* Header adjustments */
+    #headerTitle {
+        font-size: 16px;
+    }
+
+    /* Grid view tweaks */
+    .grid-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .grid-controls {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+/* Very small screens (phones in portrait) */
+@media (max-width: 480px) {
+    :root {
+        --slot-size: 30px;
+    }
+
+    #headerTitle {
+        font-size: 14px;
+        letter-spacing: 1px;
+    }
+
+    .header-btn {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    .body-part-btn {
+        min-width: 85px;
+        padding: 10px;
+    }
+
+    .body-part-btn span {
+        font-size: 11px;
+    }
+
+    .part-icon {
+        font-size: 24px;
+    }
+
+    .part-fill {
+        font-size: 9px;
+        padding: 2px 4px;
+    }
+
+    .stats-panel h3 {
+        font-size: 12px;
+    }
+
+    .stat-bar {
+        height: 16px;
+    }
+
+    .stat-fill {
+        font-size: 10px;
+    }
+
+    .inventory-item {
+        min-width: 60px;
+        padding: 6px;
+    }
+
+    .item-shape-preview {
+        width: 40px;
+        height: 40px;
+    }
+
+    .item-name {
+        font-size: 10px;
+    }
+
+    .item-size {
+        font-size: 8px;
+    }
+
+    .control-btn {
+        padding: 8px 10px;
+        font-size: 11px;
+    }
+
+    /* Debug panel smaller on mobile */
+    .debug-panel {
+        font-size: 9px;
+        padding: 8px;
+        max-width: 150px;
+    }
+}
+
+/* Landscape mode optimizations */
+@media (max-width: 900px) and (orientation: landscape) {
+    #app {
+        flex-direction: row;
+    }
+
+    #mainContainer {
+        flex-direction: row;
+    }
+
+    .view-container {
+        width: 60%;
+        overflow-y: auto;
+    }
+
+    #inventoryBar {
+        width: 40%;
+        max-height: 100%;
+        border-top: none;
+        border-left: 3px solid var(--border-primary);
+        padding: 10px;
+    }
+
+    .inventory-scroll {
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .inventory-parts {
+        flex-direction: column;
+    }
+
+    .body-silhouette {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .body-row {
+        width: auto;
+    }
+}
+
+/* Tablet portrait */
+@media (min-width: 481px) and (max-width: 768px) {
+    .body-silhouette {
+        max-width: 500px;
+    }
+
+    .body-part-btn {
+        min-width: 110px;
+    }
+
+    .stats-panel {
+        max-width: 500px;
+    }
+}
+
+/* Tablet landscape */
+@media (min-width: 769px) and (max-width: 1024px) {
+    :root {
+        --slot-size: 45px;
+    }
+
+    .body-silhouette {
+        max-width: 700px;
+    }
+
+    .body-part-btn {
+        min-width: 140px;
+        padding: 18px;
+    }
+
+    .stats-panel {
+        max-width: 700px;
+    }
+
+    .canvas-container {
+        min-height: 500px;
+    }
+}
+
+/* Touch-specific interactions */
+@media (hover: none) and (pointer: coarse) {
+    /* Remove hover effects on touch devices */
+    .body-part-btn:hover {
+        transform: none;
+    }
+
+    .inventory-item:hover {
+        transform: none;
+    }
+
+    .hover-lift:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    /* Add active states instead */
+    .body-part-btn:active {
+        transform: scale(0.95);
+        transition: transform 0.1s;
+    }
+
+    .inventory-item:active {
+        transform: scale(0.95);
+        transition: transform 0.1s;
+    }
+
+    /* Longer press indication */
+    .long-press-active {
+        animation: longPressGlow 0.5s ease-in-out;
+    }
+
+    @keyframes longPressGlow {
+        0%, 100% { box-shadow: 0 0 0 rgba(0, 255, 255, 0.5); }
+        50% { box-shadow: 0 0 20px rgba(0, 255, 255, 1); }
+    }
+}
+
+/* Prevent text selection on touch devices */
+@media (hover: none) {
+    * {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+
+    /* Allow selection for input fields if added later */
+    input,
+    textarea {
+        -webkit-user-select: text;
+        user-select: text;
+    }
+}
+
+/* Safe area insets for notched devices */
+@supports (padding: max(0px)) {
+    #header {
+        padding-left: max(15px, env(safe-area-inset-left));
+        padding-right: max(15px, env(safe-area-inset-right));
+        padding-top: max(10px, env(safe-area-inset-top));
+    }
+
+    #inventoryBar {
+        padding-left: max(15px, env(safe-area-inset-left));
+        padding-right: max(15px, env(safe-area-inset-right));
+        padding-bottom: max(15px, env(safe-area-inset-bottom));
+    }
+
+    .debug-panel {
+        bottom: max(10px, env(safe-area-inset-bottom));
+        right: max(10px, env(safe-area-inset-right));
+    }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    :root {
+        --border-primary: #00ffff;
+        --bg-secondary: #000000;
+        --bg-tertiary: #1a1a1a;
+    }
+
+    .body-part-btn,
+    .inventory-item,
+    .stats-panel {
+        border-width: 3px;
+    }
+}
+
+/* Dark mode (if system preference) */
+@media (prefers-color-scheme: dark) {
+    /* Already dark by default, but can adjust if needed */
+    :root {
+        --bg-primary: #000000;
+        --bg-secondary: #0a0a0a;
+    }
+}
+
+/* Light mode support (optional) */
+@media (prefers-color-scheme: light) {
+    :root {
+        --bg-primary: #f0f0f0;
+        --bg-secondary: #e0e0e0;
+        --bg-tertiary: #d0d0d0;
+        --text-primary: #000000;
+        --text-secondary: #0088aa;
+        --text-tertiary: #666666;
+        --border-primary: #0088aa;
+        --border-secondary: #0066aa;
+    }
+
+    body {
+        background: var(--bg-primary);
+        color: var(--text-primary);
+    }
+
+    .canvas-container {
+        background: var(--bg-secondary);
+    }
+}
+
+/* Loading state for slow connections */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-overlay .spinner {
+    width: 50px;
+    height: 50px;
+    border-width: 4px;
+    margin-bottom: 20px;
+}
+
+.loading-text {
+    color: var(--text-secondary);
+    font-size: 14px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* Offline indicator */
+.offline-indicator {
+    position: fixed;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--invalid-red);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    z-index: 3000;
+    animation: slideDown 0.3s ease-out;
+}
+
+/* Performance mode (reduced effects) */
+.performance-mode * {
+    animation: none !important;
+    transition: none !important;
+}
+
+.performance-mode .part-shimmer::before {
+    display: none;
+}
+
+.performance-mode .animate-sparkle {
+    animation: none;
+}
+
+/* Gesture hints (shown on first use) */
+.gesture-hint {
+    position: fixed;
+    bottom: 280px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid var(--border-primary);
+    border-radius: 8px;
+    padding: 15px 20px;
+    font-size: 13px;
+    text-align: center;
+    z-index: 2000;
+    animation: fadeIn 0.5s ease-out;
+    max-width: 80%;
+}
+
+.gesture-hint::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid var(--border-primary);
+}
+
+/* Swipe indicator */
+.swipe-indicator {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    color: var(--text-tertiary);
+    font-size: 24px;
+    animation: swipeHint 2s ease-in-out infinite;
+}
+
+@keyframes swipeHint {
+    0%, 100% { transform: translateY(-50%) translateX(0); opacity: 0.5; }
+    50% { transform: translateY(-50%) translateX(-10px); opacity: 1; }
+}
