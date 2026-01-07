@@ -45,8 +45,11 @@
                     <button class="filter-btn active" data-filter="all">ALLE</button>
                     <button class="filter-btn" data-filter="temporary">TEMPORÄR</button>
                     <button class="filter-btn" data-filter="permanent">PERMANENT</button>
+                    <button id="gridViewBtn" class="filter-btn" style="margin-left: auto; background: linear-gradient(135deg, #00ffff 0%, #0088ff 100%); color: #000;">🎮 GRID-ANSICHT</button>
                 </div>
 
+                <!-- OLD INVENTORY VIEW -->
+                <div id="oldInventoryView">
                 <div class="equipped-section">
                     <h3>AUSGERÜSTET</h3>
                     <div class="equipped-grid">
@@ -95,6 +98,82 @@
                     </div>
                     <button id="combineBtn" class="combine-btn" disabled>KOMBINIEREN</button>
                 </div>
+                </div>
+                <!-- END OLD INVENTORY VIEW -->
+
+                <!-- GRID INVENTORY VIEW (New) -->
+                <div id="gridInventoryView" style="display: none;">
+                    <!-- Body Part Selection -->
+                    <div id="bodyOverview" class="body-overview">
+                        <h3 style="text-align: center; color: #00ffff; margin-bottom: 15px;">KÖRPERBEREICHE</h3>
+                        <div class="body-grid-selector">
+                            <button class="body-grid-btn" data-bodypart="head">
+                                <span class="body-icon">👤</span>
+                                <span>KOPF</span>
+                                <span class="grid-fill" id="grid-fill-head">0/4</span>
+                            </button>
+                            <div class="body-row-horizontal">
+                                <button class="body-grid-btn" data-bodypart="leftArm">
+                                    <span class="body-icon">💪</span>
+                                    <span>L-ARM</span>
+                                    <span class="grid-fill" id="grid-fill-leftArm">0/6</span>
+                                </button>
+                                <button class="body-grid-btn" data-bodypart="torso">
+                                    <span class="body-icon">🛡️</span>
+                                    <span>TORSO</span>
+                                    <span class="grid-fill" id="grid-fill-torso">0/9</span>
+                                </button>
+                                <button class="body-grid-btn" data-bodypart="rightArm">
+                                    <span class="body-icon">💪</span>
+                                    <span>R-ARM</span>
+                                    <span class="grid-fill" id="grid-fill-rightArm">0/6</span>
+                                </button>
+                            </div>
+                            <button class="body-grid-btn" data-bodypart="legs">
+                                <span class="body-icon">🦿</span>
+                                <span>BEINE</span>
+                                <span class="grid-fill" id="grid-fill-legs">0/6</span>
+                            </button>
+                            <button class="body-grid-btn" data-bodypart="back">
+                                <span class="body-icon">🎒</span>
+                                <span>RÜCKEN</span>
+                                <span class="grid-fill" id="grid-fill-back">0/8</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Grid Detail View -->
+                    <div id="gridDetailView" style="display: none; margin-top: 20px;">
+                        <div class="grid-detail-header">
+                            <button id="backToBodyBtn" class="control-btn">← ZURÜCK</button>
+                            <h3 id="currentBodyPartTitle" style="color: #00ffff; flex: 1; text-align: center;">TORSO GRID</h3>
+                            <button id="rotatePartBtn" class="control-btn">↻ 90°</button>
+                        </div>
+
+                        <!-- Grid Canvas -->
+                        <div class="grid-canvas-container" style="background: #1a1a2e; border: 3px solid #00ffff; border-radius: 8px; padding: 20px; margin: 15px 0; min-height: 300px; display: flex; justify-content: center; align-items: center;">
+                            <canvas id="bodyGridCanvas" style="image-rendering: pixelated;"></canvas>
+                        </div>
+
+                        <!-- Synergies Display -->
+                        <div class="synergies-display" style="background: rgba(255, 215, 0, 0.1); border: 2px solid #ffd700; border-radius: 8px; padding: 10px; margin-top: 10px;">
+                            <h4 style="color: #ffd700; margin-bottom: 8px;">⚡ AKTIVE SYNERGIEN:</h4>
+                            <div id="activeSynergiesList" style="color: #fff; font-size: 12px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Parts List for Grid -->
+                    <div class="grid-parts-list" style="margin-top: 20px;">
+                        <h4 style="color: #00ffff; margin-bottom: 10px;">VERFÜGBARE TEILE:</h4>
+                        <div id="gridPartsList" class="inventory-grid" style="max-height: 150px; overflow-y: auto;"></div>
+                    </div>
+
+                    <!-- Auto-Fit Button -->
+                    <button id="autoFitGridBtn" class="combine-btn" style="margin-top: 15px; background: linear-gradient(135deg, #00ff88 0%, #00aa55 100%);">
+                        ✨ AUTO-FIT (Alle Teile optimal platzieren)
+                    </button>
+                </div>
+                <!-- END GRID INVENTORY VIEW -->
 
                 <button id="closeInventory" class="close-btn">SCHLIESSEN</button>
             </div>
@@ -151,6 +230,9 @@
     <script src="js/expansion.js"></script>
     <script src="js/touch.js"></script>
     <script src="js/ui.js"></script>
+
+    <!-- Grid Integration -->
+    <script src="js/grid-integration.js"></script>
 
     <!-- Game Systems -->
     <script src="js/inventory.js"></script>

@@ -342,6 +342,8 @@ function initInventoryUI(inventory) {
 
     // Filter buttons
     document.querySelectorAll('.filter-btn').forEach(btn => {
+        // Skip grid view button (handled by grid-integration.js)
+        if (btn.id === 'gridViewBtn') return;
         btn.onclick = () => inventory.setFilter(btn.dataset.filter);
     });
 
@@ -350,4 +352,9 @@ function initInventoryUI(inventory) {
         const result = inventory.tryCombine();
         alert(result.message);
     };
+
+    // Initialize grid inventory system
+    if (typeof initGridInventory === 'function') {
+        initGridInventory(inventory);
+    }
 }
