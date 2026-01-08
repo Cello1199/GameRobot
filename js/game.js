@@ -76,10 +76,14 @@ class Game {
                 case 'ArrowUp':
                 case 'w':
                 case 'W':
-                case ' ':
                     if (!this.player.input.jump) {
                         this.player.input.jumpPressed = true;
                     }
+                    this.player.input.jump = true;
+                    break;
+                case ' ':
+                    // Handle space for both jump and dash (double-tap)
+                    this.player.handleSpacePress();
                     this.player.input.jump = true;
                     break;
                 case 'c':
@@ -457,6 +461,17 @@ class Game {
 
         // Energy (for special)
         document.getElementById('energyValue').textContent = this.player.specialPower;
+
+        // Dash cooldown
+        const dashElement = document.getElementById('dashValue');
+        if (this.player.dashCooldown > 0) {
+            const cooldownSeconds = Math.ceil(this.player.dashCooldown / 60);
+            dashElement.textContent = `${cooldownSeconds}s`;
+            dashElement.style.color = '#ff6666';
+        } else {
+            dashElement.textContent = 'Ready';
+            dashElement.style.color = '#00ff88';
+        }
 
         // Parts count is updated by inventory
         this.inventory.updateStatsUI();

@@ -31,6 +31,17 @@ class Player {
         this.isJumping = false; // Track if currently in jump
         this.jumpHoldTime = 0; // Track how long jump is held
 
+        // Dash mechanics
+        this.isDashing = false;
+        this.dashTime = 0;
+        this.dashDuration = 9; // ~0.15 seconds at 60fps
+        this.dashCooldown = 0;
+        this.dashCooldownMax = 420; // 7 seconds at 60fps
+        this.dashDistance = 120;
+        this.dashDirection = 1;
+        this.lastSpacePress = 0;
+        this.doubleTapWindow = 15; // 0.25 seconds at 60fps
+
         // Mouse aiming
         this.mouseX = 0;
         this.mouseY = 0;
@@ -95,26 +106,54 @@ class Player {
         // Store previous ground state
         const wasOnGround = this.onGround;
 
-        // Apply gravity - reduced for less hectic gameplay
-        if (!this.onGround) {
+        // Update dash cooldown
+        if (this.dashCooldown > 0) {
+            this.dashCooldown--;
+        }
+
+        // Update last space press timer
+        if (this.lastSpacePress > 0) {
+            this.lastSpacePress--;
+        }
+
+        // Dash mechanics
+        if (this.isDashing) {
+            this.dashTime++;
+
+            // Dash movement
+            const dashSpeed = this.dashDistance / this.dashDuration;
+            this.vx = dashSpeed * this.dashDirection;
+            this.vy = 0; // Halt gravity during dash
+
+            // End dash
+            if (this.dashTime >= this.dashDuration) {
+                this.isDashing = false;
+                this.dashTime = 0;
+            }
+        }
+
+        // Apply gravity - reduced for less hectic gameplay (not during dash)
+        if (!this.onGround && !this.isDashing) {
             this.vy += 0.4; // Reduced gravity
         }
 
-        // Smooth horizontal movement with acceleration
-        let targetVx = 0;
-        if (this.input.left) {
-            targetVx = -this.moveSpeed;
-        }
-        if (this.input.right) {
-            targetVx = this.moveSpeed;
-        }
+        // Smooth horizontal movement with acceleration (not during dash)
+        if (!this.isDashing) {
+            let targetVx = 0;
+            if (this.input.left) {
+                targetVx = -this.moveSpeed;
+            }
+            if (this.input.right) {
+                targetVx = this.moveSpeed;
+            }
 
-        // Accelerate towards target velocity
-        if (targetVx !== 0) {
-            this.vx += (targetVx - this.vx) * this.acceleration;
-        } else {
-            // Decelerate when no input
-            this.vx *= this.deceleration;
+            // Accelerate towards target velocity
+            if (targetVx !== 0) {
+                this.vx += (targetVx - this.vx) * this.acceleration;
+            } else {
+                // Decelerate when no input
+                this.vx *= this.deceleration;
+            }
         }
 
         // Clamp horizontal velocity
@@ -336,7 +375,7 @@ class Player {
     }
 
     takeDamage(amount) {
-        if (this.invincibleFrames > 0) return false;
+        if (this.invincibleFrames > 0 || this.isDashing) return false; // Invincible during dash
 
         const actualDamage = Math.max(1, amount - this.armor);
         this.hp -= actualDamage;
@@ -351,6 +390,45 @@ class Player {
         return false;
     }
 
+    startDash() {
+        // Check cooldown
+        if (this.dashCooldown > 0) return false;
+
+        // Determine dash direction based on current movement or facing
+        if (this.input.left) {
+            this.dashDirection = -1;
+        } else if (this.input.right) {
+            this.dashDirection = 1;
+        } else {
+            // Use facing direction if no input
+            this.dashDirection = this.facing;
+        }
+
+        // Start dash
+        this.isDashing = true;
+        this.dashTime = 0;
+        this.dashCooldown = this.dashCooldownMax;
+
+        return true;
+    }
+
+    handleSpacePress() {
+        const currentTime = Date.now();
+
+        // Double-tap detection
+        if (this.lastSpacePress > 0) {
+            // Double tap detected - try to dash
+            this.startDash();
+            this.lastSpacePress = 0;
+            return 'dash';
+        } else {
+            // First tap - set timer and trigger jump
+            this.lastSpacePress = this.doubleTapWindow;
+            this.input.jumpPressed = true;
+            return 'jump';
+        }
+    }
+
     heal(amount) {
         this.hp = Math.min(this.hp + amount, this.maxHp);
     }
@@ -359,14 +437,32 @@ class Player {
         const screenX = this.x - camera.x;
         const screenY = this.y - camera.y;
 
+        // Dash visual effect
+        if (this.isDashing) {
+            ctx.globalAlpha = 0.7;
+            ctx.fillStyle = '#00ffff';
+            // Draw motion blur trail
+            for (let i = 1; i <= 3; i++) {
+                ctx.globalAlpha = 0.3 / i;
+                ctx.fillRect(screenX - (this.dashDirection * i * 8), screenY, this.width, this.height);
+            }
+            ctx.globalAlpha = 1.0;
+        }
+
         // Flicker when invincible
         if (this.invincibleFrames > 0 && Math.floor(this.invincibleFrames / 5) % 2 === 0) {
             ctx.globalAlpha = 0.5;
         }
 
         // Draw player base (human)
-        ctx.fillStyle = '#00ffff';
+        ctx.fillStyle = this.isDashing ? '#00ffff' : '#00ffff';
+        if (this.isDashing) {
+            // Glow effect during dash
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = '#00ffff';
+        }
         ctx.fillRect(screenX, screenY, this.width, this.height);
+        ctx.shadowBlur = 0;
 
         // Draw equipped parts indicators
         const equipped = this.inventory.equipped;

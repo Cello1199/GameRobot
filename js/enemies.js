@@ -32,15 +32,15 @@ class Enemy {
 
         // Type-specific stats - reduced speeds for less hectic gameplay
         const typeStats = {
-            rustyWalker: { hp: 30, damage: 5, speed: 0.8, behavior: 'walker' },
-            sparkHopper: { hp: 20, damage: 8, speed: 2, behavior: 'hopper' },
-            drillGrunt: { hp: 40, damage: 12, speed: 1.2, behavior: 'aggressive' },
-            laserSentinel: { hp: 25, damage: 10, speed: 0.8, behavior: 'ranged' },
-            shieldBearer: { hp: 50, damage: 8, speed: 0.8, behavior: 'defender' },
-            bladeDancer: { hp: 30, damage: 15, speed: 2.5, behavior: 'combo' },
-            rocketTrooper: { hp: 35, damage: 20, speed: 1.2, behavior: 'ranged' },
-            stealthHunter: { hp: 25, damage: 18, speed: 2, behavior: 'stealth' },
-            heavyCrusher: { hp: 80, damage: 25, speed: 0.4, behavior: 'tank' }
+            rustyWalker: { hp: 30, damage: 3, speed: 0.8, behavior: 'walker' },
+            sparkHopper: { hp: 20, damage: 2, speed: 2, behavior: 'hopper' },
+            drillGrunt: { hp: 40, damage: 5, speed: 1.2, behavior: 'aggressive' },
+            laserSentinel: { hp: 25, damage: 4, speed: 0.8, behavior: 'ranged' },
+            shieldBearer: { hp: 50, damage: 3, speed: 0.8, behavior: 'defender' },
+            bladeDancer: { hp: 30, damage: 6, speed: 2.5, behavior: 'combo' },
+            rocketTrooper: { hp: 35, damage: 7, speed: 1.2, behavior: 'ranged' },
+            stealthHunter: { hp: 25, damage: 6, speed: 2, behavior: 'stealth' },
+            heavyCrusher: { hp: 80, damage: 8, speed: 0.4, behavior: 'tank' }
         };
 
         const stats = typeStats[this.type] || typeStats.rustyWalker;
@@ -220,6 +220,7 @@ class Enemy {
     dropPart() {
         // Determine which parts this enemy can drop based on type
         let possibleParts = [];
+        let isRangedEnemy = false;
 
         switch (this.type) {
             case 'rustyWalker':
@@ -233,6 +234,7 @@ class Enemy {
                 break;
             case 'laserSentinel':
                 possibleParts = ['laserHead', 'laserArm'];
+                isRangedEnemy = true;
                 break;
             case 'shieldBearer':
                 possibleParts = ['shieldArm', 'shieldBack'];
@@ -242,6 +244,7 @@ class Enemy {
                 break;
             case 'rocketTrooper':
                 possibleParts = ['rocketArm', 'rocketBack'];
+                isRangedEnemy = true;
                 break;
             case 'stealthHunter':
                 possibleParts = ['stealthHead', 'stealthLegs', 'stealthBack'];
@@ -257,7 +260,19 @@ class Enemy {
         const partKey = possibleParts[Math.floor(Math.random() * possibleParts.length)];
         const rarity = PartsManager.rollRarity();
 
-        return new Part(partKey, rarity, false); // Not permanent
+        const part = new Part(partKey, rarity, false); // Not permanent
+
+        // 25% chance for ranged enemies to drop a weapon upgrade
+        if (isRangedEnemy && Math.random() < 0.25) {
+            // Boost damage and range stats for weapon parts
+            if (part.type === 'rightArm' || part.type === 'leftArm') {
+                part.stats.damage = (part.stats.damage || 0) + 5;
+                part.stats.range = (part.stats.range || 50) + 50; // Make it a ranged weapon
+                part.name = part.name + ' (Ranged)';
+            }
+        }
+
+        return part;
     }
 
     draw(ctx, camera) {
