@@ -233,9 +233,27 @@ class Inventory {
             const div = document.createElement('div');
             div.className = `inventory-item ${part.rarity} ${part.isPermanent ? 'permanent' : 'temporary'}`;
             div.style.position = 'relative';
+
+            // Create mini-grid preview of shape
+            let shapePreview = '<div style="display: flex; flex-direction: column; align-items: center; gap: 2px; margin-bottom: 4px;">';
+            const shape = part.shape || [[1]];
+            const cellSize = 8; // Small preview cells
+
+            shape.forEach((row, rowIdx) => {
+                shapePreview += '<div style="display: flex; gap: 2px;">';
+                row.forEach((cell, colIdx) => {
+                    const bgColor = cell === 1 ? part.getRarityColor() : 'transparent';
+                    const border = cell === 1 ? '1px solid rgba(255,255,255,0.3)' : '1px solid rgba(255,255,255,0.1)';
+                    shapePreview += `<div style="width: ${cellSize}px; height: ${cellSize}px; background: ${bgColor}; border: ${border};"></div>`;
+                });
+                shapePreview += '</div>';
+            });
+            shapePreview += '</div>';
+
             div.innerHTML = `
-                <strong>${part.name}</strong><br>
-                <small>${this.getPartTypeLabel(part.type)}</small>
+                ${shapePreview}
+                <strong style="display: block; text-align: center;">${part.name}</strong>
+                <small style="display: block; text-align: center;">${this.getPartTypeLabel(part.type)}</small>
             `;
 
             div.onclick = () => {
