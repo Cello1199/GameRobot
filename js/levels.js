@@ -130,11 +130,12 @@ class Level {
     }
 
     generateHazards() {
-        // Add some spikes and hazards
-        const numHazards = 5 + this.tier * 2;
+        // Add some spikes and hazards - spawn only in later sections
+        const numHazards = 3 + this.tier;
 
         for (let i = 0; i < numHazards; i++) {
-            const hazardX = 300 + Math.random() * (this.width - 700);
+            // Spawn spikes only after 60% of the level (avoid beginning)
+            const hazardX = this.width * 0.6 + Math.random() * (this.width * 0.35);
 
             this.hazards.push({
                 x: hazardX,

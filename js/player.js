@@ -8,12 +8,12 @@ class Player {
         this.height = 50;
         this.inventory = inventory;
 
-        // Movement with acceleration
+        // Movement with acceleration - smoother values
         this.vx = 0;
         this.vy = 0;
-        this.acceleration = 0.6;
-        this.deceleration = 0.85;
-        this.maxSpeed = 5;
+        this.acceleration = 0.4; // Reduced for smoother acceleration
+        this.deceleration = 0.88; // Smoother deceleration
+        this.maxSpeed = 4; // Slightly slower for better control
         this.onGround = false;
         this.facing = 1; // 1 = right, -1 = left
 
@@ -86,9 +86,9 @@ class Player {
     }
 
     update(deltaTime, level) {
-        // Apply gravity
+        // Apply gravity - reduced for less hectic gameplay
         if (!this.onGround) {
-            this.vy += 0.6; // Gravity
+            this.vy += 0.4; // Reduced gravity
         }
 
         // Smooth horizontal movement with acceleration
@@ -153,30 +153,36 @@ class Player {
 
         this.onGround = false;
 
-        // Platform collisions
+        // Platform collisions - improved detection
         level.platforms.forEach(platform => {
-            if (this.x + this.width > platform.x &&
-                this.x < platform.x + platform.width &&
-                this.y + this.height > platform.y &&
-                this.y < platform.y + platform.height) {
+            // Check if player overlaps with platform
+            const overlapX = this.x + this.width > platform.x && this.x < platform.x + platform.width;
+            const overlapY = this.y + this.height > platform.y && this.y < platform.y + platform.height;
+
+            if (overlapX && overlapY) {
+                // Determine collision direction based on previous position
+                const prevBottom = this.y + this.height - this.vy;
+                const prevTop = this.y - this.vy;
+                const prevRight = this.x + this.width - this.vx;
+                const prevLeft = this.x - this.vx;
 
                 // Landing on platform from above
-                if (this.vy > 0 && this.y + this.height - this.vy <= platform.y + 5) {
+                if (this.vy >= 0 && prevBottom <= platform.y + 8) {
                     this.y = platform.y - this.height;
                     this.vy = 0;
                     this.onGround = true;
                     this.doubleJumpUsed = false;
                 }
                 // Hit platform from below
-                else if (this.vy < 0 && this.y - this.vy >= platform.y + platform.height) {
+                else if (this.vy < 0 && prevTop >= platform.y + platform.height) {
                     this.y = platform.y + platform.height;
                     this.vy = 0;
                 }
                 // Side collisions
-                else if (this.vx > 0 && this.x - this.vx < platform.x) {
+                else if (this.vx > 0 && prevRight <= platform.x + 5) {
                     this.x = platform.x - this.width;
                     this.vx = 0;
-                } else if (this.vx < 0 && this.x + this.width - this.vx > platform.x + platform.width) {
+                } else if (this.vx < 0 && prevLeft >= platform.x + platform.width - 5) {
                     this.x = platform.x + platform.width;
                     this.vx = 0;
                 }
@@ -205,13 +211,13 @@ class Player {
     attack() {
         if (this.attackCooldown > 0) return null;
 
-        // Different cooldown for different weapons
-        this.attackCooldown = this.weaponType === 'gun' ? 15 : 30;
+        // Different cooldown for different weapons - increased for less hectic gameplay
+        this.attackCooldown = this.weaponType === 'gun' ? 20 : 40;
 
         let attack;
 
         if (this.weaponType === 'gun') {
-            // Projectile attack
+            // Projectile attack - reduced speed for less hectic gameplay
             const centerX = this.x + this.width / 2;
             const centerY = this.y + this.height / 2;
 
@@ -219,13 +225,13 @@ class Player {
                 type: 'projectile',
                 x: centerX,
                 y: centerY,
-                vx: Math.cos(this.aimAngle) * 10,
-                vy: Math.sin(this.aimAngle) * 10,
+                vx: Math.cos(this.aimAngle) * 7, // Reduced from 10 to 7
+                vy: Math.sin(this.aimAngle) * 7,
                 width: 8,
                 height: 8,
                 damage: this.damage,
                 piercing: this.canPierceShields,
-                lifetime: 120, // 2 seconds
+                lifetime: 150, // Increased lifetime since slower
                 angle: this.aimAngle
             };
         } else {
@@ -413,7 +419,7 @@ class Player {
 
         // Attack cooldown indicator
         if (this.attackCooldown > 0) {
-            const cooldownPercent = this.attackCooldown / (this.weaponType === 'gun' ? 15 : 30);
+            const cooldownPercent = this.attackCooldown / (this.weaponType === 'gun' ? 20 : 40);
             ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
             ctx.fillRect(screenX - 15, screenY + 30, 30 * (1 - cooldownPercent), 4);
         }

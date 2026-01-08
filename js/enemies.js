@@ -30,17 +30,17 @@ class Enemy {
         // Base stats by tier
         const tierMultiplier = this.tier;
 
-        // Type-specific stats
+        // Type-specific stats - reduced speeds for less hectic gameplay
         const typeStats = {
-            rustyWalker: { hp: 30, damage: 5, speed: 1, behavior: 'walker' },
-            sparkHopper: { hp: 20, damage: 8, speed: 3, behavior: 'hopper' },
-            drillGrunt: { hp: 40, damage: 12, speed: 1.5, behavior: 'aggressive' },
-            laserSentinel: { hp: 25, damage: 10, speed: 1, behavior: 'ranged' },
-            shieldBearer: { hp: 50, damage: 8, speed: 1, behavior: 'defender' },
-            bladeDancer: { hp: 30, damage: 15, speed: 4, behavior: 'combo' },
-            rocketTrooper: { hp: 35, damage: 20, speed: 1.5, behavior: 'ranged' },
-            stealthHunter: { hp: 25, damage: 18, speed: 3, behavior: 'stealth' },
-            heavyCrusher: { hp: 80, damage: 25, speed: 0.5, behavior: 'tank' }
+            rustyWalker: { hp: 30, damage: 5, speed: 0.8, behavior: 'walker' },
+            sparkHopper: { hp: 20, damage: 8, speed: 2, behavior: 'hopper' },
+            drillGrunt: { hp: 40, damage: 12, speed: 1.2, behavior: 'aggressive' },
+            laserSentinel: { hp: 25, damage: 10, speed: 0.8, behavior: 'ranged' },
+            shieldBearer: { hp: 50, damage: 8, speed: 0.8, behavior: 'defender' },
+            bladeDancer: { hp: 30, damage: 15, speed: 2.5, behavior: 'combo' },
+            rocketTrooper: { hp: 35, damage: 20, speed: 1.2, behavior: 'ranged' },
+            stealthHunter: { hp: 25, damage: 18, speed: 2, behavior: 'stealth' },
+            heavyCrusher: { hp: 80, damage: 25, speed: 0.4, behavior: 'tank' }
         };
 
         const stats = typeStats[this.type] || typeStats.rustyWalker;

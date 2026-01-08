@@ -65,7 +65,7 @@ class Inventory {
             damage: 5,
             range: 30,
             speed: 3,
-            jump: 10,
+            jump: 12,        // Increased for better jump response
             vision: 10,
             special: 0
         };
