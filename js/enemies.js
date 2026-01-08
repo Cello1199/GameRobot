@@ -304,9 +304,9 @@ class Enemy {
 class EnemySpawner {
     constructor() {
         this.enemies = [];
-        this.maxEnemies = 5;
+        this.maxEnemies = 3; // Reduced for easier start
         this.spawnTimer = 0;
-        this.spawnInterval = 180; // 3 seconds at 60fps
+        this.spawnInterval = 300; // 5 seconds at 60fps - slower spawning
     }
 
     update(deltaTime, player, level) {

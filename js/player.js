@@ -8,9 +8,12 @@ class Player {
         this.height = 50;
         this.inventory = inventory;
 
-        // Movement
+        // Movement with acceleration
         this.vx = 0;
         this.vy = 0;
+        this.acceleration = 0.6;
+        this.deceleration = 0.85;
+        this.maxSpeed = 5;
         this.onGround = false;
         this.facing = 1; // 1 = right, -1 = left
 
@@ -19,14 +22,19 @@ class Player {
             left: false,
             right: false,
             jump: false,
-            attack: false,
-            special: false
+            jumpPressed: false // Track if jump was just pressed
         };
+
+        // Mouse aiming
+        this.mouseX = 0;
+        this.mouseY = 0;
+        this.aimAngle = 0;
 
         // Combat
         this.attackCooldown = 0;
         this.specialCooldown = 0;
         this.invincibleFrames = 0;
+        this.weaponType = 'sword'; // 'sword' or 'gun'
 
         // Get initial stats from inventory
         this.updateStats();
@@ -45,6 +53,15 @@ class Player {
         this.vision = stats.vision;
         this.specialPower = stats.special;
 
+        // Determine weapon type based on equipped arm
+        const rightArm = this.inventory.equipped.rightArm;
+        if (rightArm) {
+            // Check if it's a ranged weapon (higher range = gun)
+            this.weaponType = this.attackRange > 100 ? 'gun' : 'sword';
+        } else {
+            this.weaponType = 'sword'; // Default starter
+        }
+
         // Special abilities
         this.hasDoubleJump = stats.doubleJump || false;
         this.hasFlight = stats.flight || false;
@@ -55,35 +72,65 @@ class Player {
         this.doubleJumpUsed = false;
     }
 
+    updateMousePosition(mouseX, mouseY, camera) {
+        this.mouseX = mouseX + camera.x;
+        this.mouseY = mouseY + camera.y;
+
+        // Calculate aim angle
+        const dx = this.mouseX - (this.x + this.width / 2);
+        const dy = this.mouseY - (this.y + this.height / 2);
+        this.aimAngle = Math.atan2(dy, dx);
+
+        // Update facing direction based on mouse
+        this.facing = dx >= 0 ? 1 : -1;
+    }
+
     update(deltaTime, level) {
         // Apply gravity
         if (!this.onGround) {
-            this.vy += 0.5; // Gravity
+            this.vy += 0.6; // Gravity
         }
 
-        // Horizontal movement
-        this.vx = 0;
+        // Smooth horizontal movement with acceleration
+        let targetVx = 0;
         if (this.input.left) {
-            this.vx = -this.moveSpeed;
-            this.facing = -1;
+            targetVx = -this.moveSpeed;
         }
         if (this.input.right) {
-            this.vx = this.moveSpeed;
-            this.facing = 1;
+            targetVx = this.moveSpeed;
         }
 
-        // Jumping
-        if (this.input.jump && this.onGround) {
-            this.vy = -this.jumpPower;
-            this.onGround = false;
-            this.doubleJumpUsed = false;
-        } else if (this.input.jump && !this.onGround && this.hasDoubleJump && !this.doubleJumpUsed) {
-            this.vy = -this.jumpPower * 0.8;
-            this.doubleJumpUsed = true;
+        // Accelerate towards target velocity
+        if (targetVx !== 0) {
+            this.vx += (targetVx - this.vx) * this.acceleration;
+        } else {
+            // Decelerate when no input
+            this.vx *= this.deceleration;
         }
 
-        // Clear jump input after processing
-        this.input.jump = false;
+        // Clamp horizontal velocity
+        const maxVel = this.maxSpeed;
+        if (Math.abs(this.vx) > maxVel) {
+            this.vx = maxVel * Math.sign(this.vx);
+        }
+
+        // Stop if velocity is very small
+        if (Math.abs(this.vx) < 0.1) {
+            this.vx = 0;
+        }
+
+        // Jumping - only trigger on new press
+        if (this.input.jumpPressed) {
+            if (this.onGround) {
+                this.vy = -this.jumpPower;
+                this.onGround = false;
+                this.doubleJumpUsed = false;
+            } else if (this.hasDoubleJump && !this.doubleJumpUsed) {
+                this.vy = -this.jumpPower * 0.8;
+                this.doubleJumpUsed = true;
+            }
+            this.input.jumpPressed = false; // Clear after processing
+        }
 
         // Apply velocity
         this.x += this.vx;
@@ -97,8 +144,8 @@ class Player {
         if (this.specialCooldown > 0) this.specialCooldown--;
         if (this.invincibleFrames > 0) this.invincibleFrames--;
 
-        // Clamp velocity
-        if (this.vy > 15) this.vy = 15;
+        // Clamp vertical velocity
+        if (this.vy > 20) this.vy = 20;
     }
 
     handleCollisions(level) {
@@ -114,7 +161,7 @@ class Player {
                 this.y < platform.y + platform.height) {
 
                 // Landing on platform from above
-                if (this.vy > 0 && this.y + this.height - this.vy <= platform.y) {
+                if (this.vy > 0 && this.y + this.height - this.vy <= platform.y + 5) {
                     this.y = platform.y - this.height;
                     this.vy = 0;
                     this.onGround = true;
@@ -126,10 +173,12 @@ class Player {
                     this.vy = 0;
                 }
                 // Side collisions
-                else if (this.vx > 0) {
+                else if (this.vx > 0 && this.x - this.vx < platform.x) {
                     this.x = platform.x - this.width;
-                } else if (this.vx < 0) {
+                    this.vx = 0;
+                } else if (this.vx < 0 && this.x + this.width - this.vx > platform.x + platform.width) {
                     this.x = platform.x + platform.width;
+                    this.vx = 0;
                 }
             }
         });
@@ -143,25 +192,60 @@ class Player {
         }
 
         // Keep player in bounds
-        if (this.x < 0) this.x = 0;
-        if (this.x + this.width > level.width) this.x = level.width - this.width;
+        if (this.x < 0) {
+            this.x = 0;
+            this.vx = 0;
+        }
+        if (this.x + this.width > level.width) {
+            this.x = level.width - this.width;
+            this.vx = 0;
+        }
     }
 
     attack() {
         if (this.attackCooldown > 0) return null;
 
-        this.attackCooldown = 30; // ~0.5 seconds at 60fps
+        // Different cooldown for different weapons
+        this.attackCooldown = this.weaponType === 'gun' ? 15 : 30;
 
-        // Create attack hitbox
-        const attack = {
-            x: this.x + (this.facing === 1 ? this.width : -this.attackRange),
-            y: this.y + this.height / 2 - 15,
-            width: this.attackRange,
-            height: 30,
-            damage: this.damage,
-            piercing: this.canPierceShields,
-            lifetime: 10
-        };
+        let attack;
+
+        if (this.weaponType === 'gun') {
+            // Projectile attack
+            const centerX = this.x + this.width / 2;
+            const centerY = this.y + this.height / 2;
+
+            attack = {
+                type: 'projectile',
+                x: centerX,
+                y: centerY,
+                vx: Math.cos(this.aimAngle) * 10,
+                vy: Math.sin(this.aimAngle) * 10,
+                width: 8,
+                height: 8,
+                damage: this.damage,
+                piercing: this.canPierceShields,
+                lifetime: 120, // 2 seconds
+                angle: this.aimAngle
+            };
+        } else {
+            // Melee attack (sword/triangle)
+            const centerX = this.x + this.width / 2;
+            const centerY = this.y + this.height / 2;
+            const range = this.attackRange;
+
+            attack = {
+                type: 'melee',
+                x: centerX + Math.cos(this.aimAngle) * range / 2 - range / 2,
+                y: centerY + Math.sin(this.aimAngle) * range / 2 - 15,
+                width: range,
+                height: 30,
+                damage: this.damage,
+                piercing: this.canPierceShields,
+                lifetime: 10,
+                angle: this.aimAngle
+            };
+        }
 
         return attack;
     }
@@ -264,27 +348,124 @@ class Player {
             ctx.fillRect(screenX + (this.facing === -1 ? -8 : this.width), screenY + 10, 8, 20);
         }
 
-        // Direction indicator
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(
-            screenX + (this.facing === 1 ? this.width - 5 : 0),
-            screenY + this.height / 2 - 2,
-            5,
-            4
-        );
-
         ctx.globalAlpha = 1.0;
+    }
+
+    drawCrosshair(ctx, camera) {
+        const screenX = this.mouseX - camera.x;
+        const screenY = this.mouseY - camera.y;
+
+        ctx.save();
+        ctx.translate(screenX, screenY);
+
+        if (this.weaponType === 'gun') {
+            // Gun crosshair - circle with cross
+            ctx.strokeStyle = '#00fff5';
+            ctx.lineWidth = 2;
+
+            // Outer circle
+            ctx.beginPath();
+            ctx.arc(0, 0, 20, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Cross lines
+            ctx.beginPath();
+            ctx.moveTo(-25, 0);
+            ctx.lineTo(-5, 0);
+            ctx.moveTo(5, 0);
+            ctx.lineTo(25, 0);
+            ctx.moveTo(0, -25);
+            ctx.lineTo(0, -5);
+            ctx.moveTo(0, 5);
+            ctx.lineTo(0, 25);
+            ctx.stroke();
+
+            // Center dot
+            ctx.fillStyle = '#ff0055';
+            ctx.fillRect(-1, -1, 2, 2);
+        } else {
+            // Sword triangle - points towards attack direction
+            ctx.rotate(this.aimAngle + Math.PI / 2);
+
+            ctx.strokeStyle = '#00fff5';
+            ctx.fillStyle = 'rgba(0, 255, 245, 0.3)';
+            ctx.lineWidth = 2;
+
+            // Triangle
+            ctx.beginPath();
+            ctx.moveTo(0, -25);
+            ctx.lineTo(-15, 10);
+            ctx.lineTo(15, 10);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Attack range indicator
+            const range = this.attackRange;
+            ctx.strokeStyle = 'rgba(255, 255, 0, 0.5)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(0, -25, range, -Math.PI/3, Math.PI/3);
+            ctx.stroke();
+        }
+
+        ctx.restore();
+
+        // Attack cooldown indicator
+        if (this.attackCooldown > 0) {
+            const cooldownPercent = this.attackCooldown / (this.weaponType === 'gun' ? 15 : 30);
+            ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+            ctx.fillRect(screenX - 15, screenY + 30, 30 * (1 - cooldownPercent), 4);
+        }
     }
 
     drawAttack(ctx, camera, attack) {
         if (!attack) return;
 
-        const screenX = attack.x - camera.x;
-        const screenY = attack.y - camera.y;
+        if (attack.type === 'projectile') {
+            // Draw bullet/projectile
+            const screenX = attack.x - camera.x;
+            const screenY = attack.y - camera.y;
 
-        ctx.fillStyle = attack.piercing ? '#ff00ff' : '#ffff00';
-        ctx.globalAlpha = 0.6;
-        ctx.fillRect(screenX, screenY, attack.width, attack.height);
+            ctx.save();
+            ctx.translate(screenX, screenY);
+            ctx.rotate(attack.angle);
+
+            // Bullet glow
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = attack.piercing ? '#ff00ff' : '#ffff00';
+
+            ctx.fillStyle = attack.piercing ? '#ff00ff' : '#ffff00';
+            ctx.fillRect(-4, -2, 8, 4);
+
+            // Bullet trail
+            ctx.globalAlpha = 0.3;
+            ctx.fillRect(-8, -1, 4, 2);
+
+            ctx.restore();
+            ctx.shadowBlur = 0;
+        } else {
+            // Draw melee slash
+            const screenX = attack.x - camera.x;
+            const screenY = attack.y - camera.y;
+
+            ctx.save();
+            ctx.translate(screenX + attack.width / 2, screenY + attack.height / 2);
+            ctx.rotate(attack.angle);
+
+            // Slash effect
+            ctx.strokeStyle = attack.piercing ? '#ff00ff' : '#ffff00';
+            ctx.lineWidth = 3;
+            ctx.globalAlpha = 0.7 - (10 - attack.lifetime) / 15;
+
+            const range = attack.width;
+            ctx.beginPath();
+            ctx.arc(0, 0, range * 0.8, -Math.PI/3, Math.PI/3);
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
         ctx.globalAlpha = 1.0;
     }
 }

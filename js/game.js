@@ -24,6 +24,13 @@ class Game {
         // Dropped parts (visible in world)
         this.droppedParts = [];
 
+        // Active attacks/projectiles
+        this.activeAttacks = [];
+
+        // Mouse position
+        this.mouseX = 0;
+        this.mouseY = 0;
+
         // Game loop
         this.lastTime = 0;
         this.animationId = null;
@@ -58,26 +65,31 @@ class Game {
             switch (e.key) {
                 case 'ArrowLeft':
                 case 'a':
+                case 'A':
                     this.player.input.left = true;
                     break;
                 case 'ArrowRight':
                 case 'd':
+                case 'D':
                     this.player.input.right = true;
                     break;
                 case 'ArrowUp':
                 case 'w':
+                case 'W':
                 case ' ':
+                    if (!this.player.input.jump) {
+                        this.player.input.jumpPressed = true;
+                    }
                     this.player.input.jump = true;
                     break;
-                case 'x':
-                case 'j':
-                    this.player.input.attack = true;
-                    break;
                 case 'c':
+                case 'C':
                 case 'k':
-                    this.player.input.special = true;
+                case 'K':
+                    this.handleSpecial();
                     break;
                 case 'i':
+                case 'I':
                 case 'Escape':
                     this.inventory.toggle();
                     break;
@@ -90,22 +102,44 @@ class Game {
             switch (e.key) {
                 case 'ArrowLeft':
                 case 'a':
+                case 'A':
                     this.player.input.left = false;
                     break;
                 case 'ArrowRight':
                 case 'd':
+                case 'D':
                     this.player.input.right = false;
                     break;
-                case 'x':
-                case 'j':
-                    this.player.input.attack = false;
-                    break;
-                case 'c':
-                case 'k':
-                    this.player.input.special = false;
+                case 'ArrowUp':
+                case 'w':
+                case 'W':
+                case ' ':
+                    this.player.input.jump = false;
                     break;
             }
         });
+
+        // Mouse controls
+        this.canvas.addEventListener('mousemove', (e) => {
+            if (this.state !== 'playing') return;
+            const rect = this.canvas.getBoundingClientRect();
+            this.mouseX = e.clientX - rect.left;
+            this.mouseY = e.clientY - rect.top;
+
+            if (this.player) {
+                this.player.updateMousePosition(this.mouseX, this.mouseY, this.camera);
+            }
+        });
+
+        this.canvas.addEventListener('mousedown', (e) => {
+            if (this.state !== 'playing') return;
+            if (e.button === 0) { // Left click
+                this.handleAttack();
+            }
+        });
+
+        // Hide cursor on canvas
+        this.canvas.style.cursor = 'none';
     }
 
     setupUI() {
@@ -125,11 +159,16 @@ class Game {
         this.spawner = new EnemySpawner();
         this.boss = null;
         this.droppedParts = [];
+        this.activeAttacks = [];
 
-        // Give player a starting part
-        const startingPart = new Part('rustyArm', RARITY.UNCOMMON, true);
-        this.inventory.addPart(startingPart);
-        this.inventory.equipPart(startingPart.id);
+        // Give player starter sword (better stats for beginning)
+        const starterSword = new Part('rustyArm', RARITY.COMMON);
+        starterSword.isPermanent = false; // Not permanent
+        starterSword.name = 'Starter Schwert';
+        starterSword.stats.damage = 10; // Boosted damage for start
+        starterSword.stats.range = 60; // Melee range
+        this.inventory.addPart(starterSword);
+        this.inventory.equipPart(starterSword.id);
         this.player.updateStats();
 
         this.state = 'playing';
@@ -207,6 +246,9 @@ class Game {
             this.checkCombat();
         }
 
+        // Update active attacks (projectiles)
+        this.updateActiveAttacks();
+
         // Update dropped parts
         this.updateDroppedParts();
 
@@ -225,20 +267,55 @@ class Game {
         this.updateHUD();
     }
 
+    updateActiveAttacks() {
+        for (let i = this.activeAttacks.length - 1; i >= 0; i--) {
+            const attack = this.activeAttacks[i];
+
+            // Update projectile position
+            if (attack.type === 'projectile') {
+                attack.x += attack.vx;
+                attack.y += attack.vy;
+            }
+
+            // Decrease lifetime
+            attack.lifetime--;
+
+            // Remove expired attacks
+            if (attack.lifetime <= 0) {
+                this.activeAttacks.splice(i, 1);
+                continue;
+            }
+
+            // Check if out of bounds
+            if (attack.x < 0 || attack.x > this.level.width ||
+                attack.y < 0 || attack.y > this.level.height) {
+                this.activeAttacks.splice(i, 1);
+            }
+        }
+    }
+
     checkCombat() {
         const enemies = this.boss && this.boss.alive ? [this.boss] : this.spawner.enemies;
 
         enemies.forEach(enemy => {
             if (!enemy.alive) return;
 
-            // Check if player attack hits enemy
-            if (this.currentAttack) {
-                const hit = this.checkCollision(this.currentAttack, enemy);
+            // Check all active attacks against this enemy
+            for (let i = this.activeAttacks.length - 1; i >= 0; i--) {
+                const attack = this.activeAttacks[i];
+                const hit = this.checkCollision(attack, enemy);
+
                 if (hit) {
-                    const died = enemy.takeDamage(this.currentAttack.damage, this.currentAttack.piercing);
+                    const died = enemy.takeDamage(attack.damage, attack.piercing);
                     if (died) {
                         this.onEnemyKilled(enemy);
                     }
+
+                    // Remove melee attacks on hit, keep projectiles unless not piercing
+                    if (attack.type === 'melee' || !attack.piercing) {
+                        this.activeAttacks.splice(i, 1);
+                    }
+                    break; // One attack at a time
                 }
             }
 
@@ -254,20 +331,27 @@ class Game {
     }
 
     handleAttack() {
-        this.currentAttack = this.player.attack();
+        const attack = this.player.attack();
 
-        if (this.currentAttack) {
-            // Attack lasts for a few frames
-            setTimeout(() => {
-                this.currentAttack = null;
-            }, 200);
+        if (attack) {
+            // Add attack to active attacks list
+            this.activeAttacks.push(attack);
         }
     }
 
     handleSpecial() {
         const special = this.player.useSpecial();
         if (special) {
-            // Handle special effects
+            // Handle special effects (could create area attacks, buffs, etc.)
+            // For now, just add it as an attack
+            if (special.type === 'basic') {
+                // Create an explosion-like attack
+                special.x = this.player.x;
+                special.y = this.player.y;
+                special.width = 100;
+                special.height = 100;
+                this.activeAttacks.push(special);
+            }
         }
     }
 
@@ -432,10 +516,14 @@ class Game {
         // Draw player
         this.player.draw(this.ctx, this.camera);
 
-        // Draw player attack
-        if (this.currentAttack && this.currentAttack.lifetime > 0) {
-            this.player.drawAttack(this.ctx, this.camera, this.currentAttack);
-            this.currentAttack.lifetime--;
+        // Draw all active attacks (projectiles and melee)
+        this.activeAttacks.forEach(attack => {
+            this.player.drawAttack(this.ctx, this.camera, attack);
+        });
+
+        // Draw crosshair on top of everything
+        if (this.player) {
+            this.player.drawCrosshair(this.ctx, this.camera);
         }
     }
 
