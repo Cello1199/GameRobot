@@ -25,6 +25,12 @@ class Player {
             jumpPressed: false // Track if jump was just pressed
         };
 
+        // Jump mechanics - like classic platformers
+        this.jumpBufferTime = 0; // Allows jumping slightly before landing
+        this.coyoteTime = 0; // Allows jumping shortly after leaving platform
+        this.isJumping = false; // Track if currently in jump
+        this.jumpHoldTime = 0; // Track how long jump is held
+
         // Mouse aiming
         this.mouseX = 0;
         this.mouseY = 0;
@@ -86,6 +92,9 @@ class Player {
     }
 
     update(deltaTime, level) {
+        // Store previous ground state
+        const wasOnGround = this.onGround;
+
         // Apply gravity - reduced for less hectic gameplay
         if (!this.onGround) {
             this.vy += 0.4; // Reduced gravity
@@ -119,17 +128,60 @@ class Player {
             this.vx = 0;
         }
 
-        // Jumping - only trigger on new press
+        // Coyote time - grace period after leaving platform
+        if (wasOnGround && !this.onGround && this.vy >= 0) {
+            this.coyoteTime = 6; // 6 frames of grace
+        }
+        if (this.coyoteTime > 0) {
+            this.coyoteTime--;
+        }
+
+        // Jump buffer - allows jump input slightly before landing
         if (this.input.jumpPressed) {
-            if (this.onGround) {
-                this.vy = -this.jumpPower;
-                this.onGround = false;
-                this.doubleJumpUsed = false;
-            } else if (this.hasDoubleJump && !this.doubleJumpUsed) {
-                this.vy = -this.jumpPower * 0.8;
-                this.doubleJumpUsed = true;
+            this.jumpBufferTime = 6; // 6 frames buffer
+            this.input.jumpPressed = false;
+        }
+        if (this.jumpBufferTime > 0) {
+            this.jumpBufferTime--;
+        }
+
+        // Jumping - platformer style with coyote time and jump buffer
+        const canJump = this.onGround || this.coyoteTime > 0;
+
+        if (this.jumpBufferTime > 0 && canJump) {
+            // Execute jump
+            this.vy = -this.jumpPower;
+            this.onGround = false;
+            this.isJumping = true;
+            this.jumpHoldTime = 0;
+            this.jumpBufferTime = 0;
+            this.coyoteTime = 0;
+            this.doubleJumpUsed = false;
+        } else if (this.input.jump && !this.onGround && this.hasDoubleJump && !this.doubleJumpUsed && !canJump) {
+            // Double jump
+            this.vy = -this.jumpPower * 0.8;
+            this.doubleJumpUsed = true;
+            this.isJumping = true;
+            this.jumpHoldTime = 0;
+        }
+
+        // Variable jump height - release jump early for shorter jump
+        if (this.isJumping) {
+            if (this.input.jump) {
+                this.jumpHoldTime++;
+            } else {
+                // Released jump button - cut jump short
+                if (this.vy < -2) {
+                    this.vy *= 0.5; // Cut upward velocity
+                }
+                this.isJumping = false;
             }
-            this.input.jumpPressed = false; // Clear after processing
+        }
+
+        // Reset jump state when landing
+        if (this.onGround) {
+            this.isJumping = false;
+            this.jumpHoldTime = 0;
         }
 
         // Apply velocity
