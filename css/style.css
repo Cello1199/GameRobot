@@ -1,3 +1,47 @@
+/* ============================================
+   SALVAGED TECH STYLE - SCRAP RISING
+   Rostige Scrapyard-Ästhetik + Holografische Hightech-Elemente
+   ============================================ */
+
+/* CSS VARIABLES - Color Palette */
+:root {
+    /* Rust & Metal (Passiv/Statisch) */
+    --rust-dark: #2d1f1a;
+    --rust-medium: #4a3228;
+    --rust-light: #5c4a3d;
+    --metal-dark: #2a2a2a;
+    --metal-medium: #4a4a4a;
+    --metal-light: #6a6a6a;
+
+    /* Hologram (Interaktiv/Aktiv) */
+    --holo-cyan-glow: #00fff5;
+    --holo-cyan-bright: #00d4d4;
+    --holo-cyan-dim: #006666;
+    --holo-magenta-glow: #ff00ff;
+    --holo-magenta-bright: #d400d4;
+
+    /* Status */
+    --success: #00ff66;
+    --warning: #ffaa00;
+    --danger: #ff3344;
+
+    /* Raritäten */
+    --rarity-common: #6a6a6a;
+    --rarity-uncommon: #00ff66;
+    --rarity-rare: #00aaff;
+    --rarity-epic: #aa88ff;
+    --rarity-legendary: #ffdd00;
+
+    /* Text */
+    --text-primary: #e8e8e8;
+    --text-secondary: #a0a0a0;
+    --text-holo: #00fff5;
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
 * {
     margin: 0;
     padding: 0;
@@ -8,19 +52,20 @@
 }
 
 body {
-    font-family: 'Courier New', monospace;
-    background: #0a0a0a;
+    font-family: 'Share Tech Mono', 'Courier New', monospace;
+    background: linear-gradient(135deg, var(--rust-dark) 0%, #1a1210 100%);
     overflow: hidden;
     width: 100vw;
     height: 100vh;
     position: fixed;
+    color: var(--text-primary);
 }
 
 #game-container {
     position: relative;
     width: 100vw;
     height: 100vh;
-    background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1e 100%);
+    background: linear-gradient(135deg, var(--rust-dark) 0%, #1a1210 100%);
 }
 
 #gameCanvas {
@@ -30,7 +75,65 @@ body {
     touch-action: none;
 }
 
-/* HUD Styles */
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+/* Glow Pulse */
+@keyframes glow-pulse {
+    0%, 100% {
+        box-shadow: 0 0 8px rgba(0, 255, 245, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(0, 255, 245, 0.6);
+    }
+}
+
+/* Hologram Glow for Text */
+@keyframes text-glow-pulse {
+    0%, 100% {
+        text-shadow: 0 0 8px var(--holo-cyan-glow);
+    }
+    50% {
+        text-shadow: 0 0 15px var(--holo-cyan-glow), 0 0 25px var(--holo-cyan-glow);
+    }
+}
+
+/* Error Shake */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+}
+
+/* Hologram Flicker (sparsam einsetzen) */
+@keyframes flicker {
+    0%, 100% { opacity: 1; }
+    92% { opacity: 0.8; }
+    94% { opacity: 1; }
+}
+
+/* Rainbow (für Mega-Rarity) */
+@keyframes rainbow {
+    0% { border-color: #ff0000; box-shadow: 0 0 15px #ff0000; }
+    16% { border-color: #ff8800; box-shadow: 0 0 15px #ff8800; }
+    33% { border-color: #ffff00; box-shadow: 0 0 15px #ffff00; }
+    50% { border-color: #00ff00; box-shadow: 0 0 15px #00ff00; }
+    66% { border-color: #0088ff; box-shadow: 0 0 15px #0088ff; }
+    83% { border-color: #aa00ff; box-shadow: 0 0 15px #aa00ff; }
+    100% { border-color: #ff0000; box-shadow: 0 0 15px #ff0000; }
+}
+
+/* Scanline Effect */
+@keyframes scanline {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+}
+
+/* ============================================
+   HUD STYLES
+   ============================================ */
+
 #hud {
     position: absolute;
     top: 0;
@@ -51,47 +154,90 @@ body {
 .health-bar, .boss-health {
     flex: 1;
     max-width: 300px;
+    position: relative;
 }
 
+/* Nieten an HUD-Elementen */
+.health-bar::before,
+.health-bar::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: radial-gradient(circle at 30% 30%, var(--metal-light), var(--metal-dark));
+    border-radius: 50%;
+    top: -5px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
+}
+
+.health-bar::before { left: -5px; }
+.health-bar::after { right: -5px; }
+
 .bar-label {
-    color: #00ff88;
+    color: var(--text-holo);
     font-size: 12px;
     font-weight: bold;
     margin-bottom: 4px;
-    text-shadow: 0 0 5px #00ff88;
+    text-shadow: 0 0 8px var(--holo-cyan-glow);
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
 .bar-container {
-    background: rgba(0, 0, 0, 0.7);
-    border: 2px solid #00ff88;
-    border-radius: 4px;
+    background: var(--rust-dark);
+    border: 2px solid var(--metal-medium);
+    border-radius: 3px;
     height: 20px;
     overflow: hidden;
-    box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+    position: relative;
+}
+
+/* Scanline Overlay für Hologramm-Effekt */
+.bar-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(0, 255, 245, 0.3) 50%,
+        transparent 100%
+    );
+    animation: scanline 2s linear infinite;
 }
 
 .bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, #00ff88 0%, #00cc66 100%);
+    background: linear-gradient(90deg, var(--success) 0%, #00aa44 100%);
     transition: width 0.3s ease;
     width: 100%;
-    box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.5);
+    box-shadow:
+        inset 0 0 10px rgba(255, 255, 255, 0.3),
+        0 0 10px rgba(0, 255, 102, 0.5);
 }
 
 .bar-fill.boss {
-    background: linear-gradient(90deg, #ff0066 0%, #cc0044 100%);
+    background: linear-gradient(90deg, var(--danger) 0%, #cc0022 100%);
+    box-shadow:
+        inset 0 0 10px rgba(255, 255, 255, 0.3),
+        0 0 10px rgba(255, 51, 68, 0.5);
 }
 
 .hud-info {
     display: flex;
     justify-content: space-between;
-    color: #00ffff;
+    color: var(--text-holo);
     font-size: 14px;
-    text-shadow: 0 0 5px #00ffff;
+    text-shadow: 0 0 5px var(--holo-cyan-glow);
     font-weight: bold;
 }
 
-/* Touch Controls */
+/* ============================================
+   TOUCH CONTROLS
+   ============================================ */
+
 #touchControls {
     position: absolute;
     bottom: 0;
@@ -122,9 +268,9 @@ body {
 
 .control-btn {
     pointer-events: auto;
-    border: 3px solid #00ffff;
-    background: rgba(0, 100, 150, 0.5);
-    color: #00ffff;
+    border: 3px solid var(--holo-cyan-bright);
+    background: rgba(0, 212, 212, 0.15);
+    color: var(--text-holo);
     font-size: 24px;
     font-weight: bold;
     border-radius: 50%;
@@ -135,14 +281,28 @@ body {
     justify-content: center;
     cursor: pointer;
     transition: all 0.1s;
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+    box-shadow: 0 0 15px rgba(0, 255, 245, 0.3);
     touch-action: none;
+    position: relative;
+}
+
+/* Nieten-Dekoration */
+.control-btn::before {
+    content: '';
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: radial-gradient(circle at 30% 30%, var(--metal-light), var(--metal-dark));
+    border-radius: 50%;
+    top: 5px;
+    left: 5px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
 }
 
 .control-btn:active {
-    background: rgba(0, 255, 255, 0.6);
+    background: rgba(0, 255, 245, 0.3);
     transform: scale(0.95);
-    box-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
+    box-shadow: 0 0 25px rgba(0, 255, 245, 0.6);
 }
 
 .dpad-btn {
@@ -159,18 +319,19 @@ body {
 .special-btn {
     width: 60px;
     height: 60px;
-    background: rgba(150, 0, 150, 0.5);
-    border-color: #ff00ff;
-    color: #ff00ff;
+    background: rgba(212, 0, 212, 0.15);
+    border-color: var(--holo-magenta-bright);
+    color: var(--holo-magenta-glow);
     font-size: 20px;
     align-self: flex-end;
     margin-right: 90px;
     margin-bottom: -50px;
+    box-shadow: 0 0 15px rgba(255, 0, 255, 0.3);
 }
 
 .special-btn:active {
-    background: rgba(255, 0, 255, 0.6);
-    box-shadow: 0 0 30px rgba(255, 0, 255, 0.8);
+    background: rgba(255, 0, 255, 0.3);
+    box-shadow: 0 0 25px rgba(255, 0, 255, 0.6);
 }
 
 .inv-btn {
@@ -180,23 +341,30 @@ body {
     position: absolute;
     top: -180px;
     right: 10px;
-    background: rgba(100, 100, 100, 0.5);
-    border-color: #888;
-    color: #fff;
+    background: rgba(74, 74, 74, 0.5);
+    border-color: var(--metal-medium);
+    color: var(--text-primary);
+    box-shadow: 0 0 8px rgba(74, 74, 74, 0.3);
 }
 
 .inv-btn:active {
-    background: rgba(150, 150, 150, 0.6);
+    background: rgba(106, 106, 106, 0.5);
 }
 
-/* Screen Overlays */
+/* ============================================
+   SCREEN OVERLAYS
+   ============================================ */
+
 .screen-overlay {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.95);
+    background: linear-gradient(135deg,
+        rgba(45, 31, 26, 0.98) 0%,
+        rgba(26, 18, 16, 0.98) 100%
+    );
     z-index: 100;
     display: flex;
     align-items: center;
@@ -204,93 +372,189 @@ body {
     pointer-events: auto;
 }
 
-/* Start Screen */
+/* ============================================
+   START SCREEN
+   ============================================ */
+
 .start-container {
     text-align: center;
-    color: #00ffff;
-    padding: 20px;
+    color: var(--text-holo);
+    padding: 30px;
+    background: rgba(45, 31, 26, 0.8);
+    border: 3px solid var(--metal-medium);
+    border-radius: 4px;
+    position: relative;
+    box-shadow:
+        inset 0 0 30px rgba(0, 0, 0, 0.5),
+        0 0 40px rgba(0, 255, 245, 0.3);
 }
+
+/* Nieten an Ecken */
+.start-container::before,
+.start-container::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: radial-gradient(circle at 30% 30%, var(--metal-light), var(--metal-dark));
+    border-radius: 50%;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
+}
+
+.start-container::before { top: 8px; left: 8px; }
+.start-container::after { top: 8px; right: 8px; }
 
 .start-container h1 {
     font-size: 48px;
     margin-bottom: 10px;
-    text-shadow: 0 0 20px #00ffff;
-    animation: glow 2s ease-in-out infinite;
-}
-
-@keyframes glow {
-    0%, 100% { text-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff; }
-    50% { text-shadow: 0 0 30px #00ffff, 0 0 60px #00ffff, 0 0 80px #00ffff; }
+    text-shadow: 0 0 15px var(--holo-cyan-glow);
+    animation: text-glow-pulse 2s ease-in-out infinite;
+    letter-spacing: 3px;
+    text-transform: uppercase;
 }
 
 .tagline {
     font-size: 18px;
     margin-bottom: 30px;
-    color: #00ff88;
+    color: var(--success);
+    text-shadow: 0 0 8px var(--success);
 }
 
 .start-btn {
-    background: linear-gradient(135deg, #00ffff 0%, #0088ff 100%);
-    border: none;
-    color: #000;
+    background: transparent;
+    border: 3px solid var(--holo-cyan-bright);
+    color: var(--text-holo);
     font-size: 24px;
     font-weight: bold;
     padding: 15px 40px;
-    border-radius: 8px;
+    border-radius: 3px;
     cursor: pointer;
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    box-shadow:
+        0 0 20px rgba(0, 255, 245, 0.4),
+        inset 0 0 20px rgba(0, 255, 245, 0.1);
     transition: all 0.3s;
-    font-family: 'Courier New', monospace;
+    font-family: 'Share Tech Mono', 'Courier New', monospace;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    position: relative;
+}
+
+.start-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(0, 255, 245, 0.2);
+    border-radius: 3px;
+    transform: translate(-50%, -50%);
+    transition: all 0.3s;
 }
 
 .start-btn:active {
     transform: scale(0.95);
-    box-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
+    box-shadow: 0 0 30px rgba(0, 255, 245, 0.8);
+}
+
+.start-btn:active::before {
+    width: 100%;
+    height: 100%;
 }
 
 .instructions {
     margin-top: 40px;
-    font-size: 14px;
-    color: #888;
+    font-size: 13px;
+    color: var(--text-secondary);
 }
 
 .instructions h3 {
-    color: #00ffff;
+    color: var(--text-holo);
     margin-bottom: 10px;
+    text-shadow: 0 0 8px var(--holo-cyan-glow);
+    letter-spacing: 1px;
 }
 
-/* Game Over Screen */
+/* ============================================
+   GAME OVER SCREEN
+   ============================================ */
+
 .gameover-container {
     text-align: center;
-    color: #ff0066;
-    padding: 20px;
+    color: var(--danger);
+    padding: 30px;
+    background: rgba(45, 31, 26, 0.8);
+    border: 3px solid var(--metal-medium);
+    border-radius: 4px;
+    position: relative;
 }
 
 .gameover-container h1 {
     font-size: 48px;
     margin-bottom: 20px;
-    text-shadow: 0 0 20px #ff0066;
+    text-shadow: 0 0 20px var(--danger);
+    letter-spacing: 2px;
 }
 
-/* Inventory Screen */
+/* ============================================
+   INVENTORY SCREEN
+   ============================================ */
+
 .inventory-container {
     width: 95%;
     max-width: 800px;
     height: 90%;
-    background: rgba(10, 10, 30, 0.98);
-    border: 3px solid #00ffff;
-    border-radius: 10px;
+    background: linear-gradient(135deg, var(--rust-medium) 0%, var(--rust-dark) 100%);
+    border: 3px solid var(--metal-medium);
+    border-radius: 4px;
     padding: 20px;
     overflow-y: auto;
-    color: #fff;
-    box-shadow: 0 0 40px rgba(0, 255, 255, 0.5);
+    color: var(--text-primary);
+    box-shadow:
+        inset 0 0 40px rgba(0, 0, 0, 0.5),
+        0 0 30px rgba(0, 255, 245, 0.2);
+    position: relative;
 }
+
+/* Nieten an Ecken */
+.inventory-container::before,
+.inventory-container::after {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    background: radial-gradient(circle at 30% 30%, var(--metal-light), var(--metal-dark));
+    border-radius: 50%;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
+    z-index: 10;
+}
+
+.inventory-container::before { top: 10px; left: 10px; }
+.inventory-container::after { top: 10px; right: 10px; }
 
 .inventory-container h2 {
     text-align: center;
-    color: #00ffff;
+    color: var(--text-holo);
     margin-bottom: 20px;
-    text-shadow: 0 0 10px #00ffff;
+    text-shadow: 0 0 10px var(--holo-cyan-glow);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+/* Schweißnaht als Trenner unter Überschrift */
+.inventory-container h2::after {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        var(--rust-light) 20%,
+        var(--rust-medium) 50%,
+        var(--rust-light) 80%,
+        transparent 100%
+    );
+    margin-top: 10px;
 }
 
 .inventory-filters {
@@ -298,38 +562,67 @@ body {
     justify-content: center;
     gap: 10px;
     margin-bottom: 20px;
+    flex-wrap: wrap;
 }
 
 .filter-btn {
-    background: rgba(0, 100, 150, 0.5);
-    border: 2px solid #00ffff;
-    color: #00ffff;
+    background: transparent;
+    border: 2px solid var(--metal-medium);
+    color: var(--text-secondary);
     padding: 8px 16px;
-    border-radius: 4px;
+    border-radius: 3px;
     cursor: pointer;
-    font-family: 'Courier New', monospace;
+    font-family: 'Share Tech Mono', 'Courier New', monospace;
     font-size: 12px;
     transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.filter-btn:hover {
+    border-color: var(--holo-cyan-bright);
+    color: var(--text-holo);
 }
 
 .filter-btn.active {
-    background: rgba(0, 255, 255, 0.5);
-    color: #000;
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
+    background: rgba(0, 255, 245, 0.15);
+    border-color: var(--holo-cyan-bright);
+    color: var(--text-holo);
+    box-shadow: 0 0 15px rgba(0, 255, 245, 0.3);
+    text-shadow: 0 0 8px var(--holo-cyan-glow);
 }
 
 .equipped-section, .inventory-section, .combination-section {
     margin-bottom: 25px;
     padding: 15px;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid #00ffff;
-    border-radius: 5px;
+    background: rgba(26, 18, 16, 0.5);
+    border: 2px solid var(--metal-medium);
+    border-radius: 3px;
+    position: relative;
+}
+
+/* Nieten an Sektionen */
+.equipped-section::before,
+.inventory-section::before,
+.combination-section::before {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: radial-gradient(circle at 30% 30%, var(--metal-light), var(--metal-dark));
+    border-radius: 50%;
+    top: -5px;
+    left: 10px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
 }
 
 .equipped-section h3, .inventory-section h3, .combination-section h3 {
-    color: #00ff88;
+    color: var(--text-holo);
     margin-bottom: 15px;
     font-size: 16px;
+    text-shadow: 0 0 8px var(--holo-cyan-glow);
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
 .equipped-grid {
@@ -339,18 +632,21 @@ body {
 }
 
 .equip-slot {
-    background: rgba(0, 50, 80, 0.5);
-    border: 2px solid #00ffff;
-    border-radius: 5px;
+    background: var(--rust-dark);
+    border: 2px solid var(--metal-medium);
+    border-radius: 3px;
     padding: 8px;
     text-align: center;
     min-height: 80px;
+    position: relative;
 }
 
 .slot-label {
     font-size: 10px;
-    color: #00ffff;
+    color: var(--text-holo);
     margin-bottom: 5px;
+    text-shadow: 0 0 5px var(--holo-cyan-glow);
+    text-transform: uppercase;
 }
 
 .slot-content {
@@ -369,41 +665,67 @@ body {
     overflow-y: auto;
 }
 
+/* Custom Scrollbar */
+.inventory-grid::-webkit-scrollbar,
+.inventory-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.inventory-grid::-webkit-scrollbar-track,
+.inventory-container::-webkit-scrollbar-track {
+    background: var(--rust-dark);
+}
+
+.inventory-grid::-webkit-scrollbar-thumb,
+.inventory-container::-webkit-scrollbar-thumb {
+    background: var(--metal-medium);
+    border-radius: 4px;
+}
+
+.inventory-grid::-webkit-scrollbar-thumb:hover,
+.inventory-container::-webkit-scrollbar-thumb:hover {
+    background: var(--metal-light);
+}
+
 .inventory-item {
-    background: rgba(50, 50, 50, 0.8);
-    border: 2px solid #666;
-    border-radius: 5px;
+    background: var(--rust-dark);
+    border: 2px solid var(--metal-medium);
+    border-radius: 3px;
     padding: 10px;
     text-align: center;
     cursor: pointer;
     transition: all 0.2s;
     font-size: 11px;
+    position: relative;
 }
 
 .inventory-item:hover {
-    transform: scale(1.05);
-    border-color: #00ffff;
+    transform: translateY(-3px);
+    border-color: var(--holo-cyan-bright);
+    box-shadow: 0 5px 15px rgba(0, 255, 245, 0.3);
 }
 
-.inventory-item.common { border-color: #888; }
-.inventory-item.uncommon { border-color: #00ff00; }
-.inventory-item.rare { border-color: #0088ff; }
-.inventory-item.epic { border-color: #aa00ff; }
-.inventory-item.super { border-color: #ffaa00; box-shadow: 0 0 10px #ffaa00; }
+/* Rarity Borders mit Glow */
+.inventory-item.common { border-color: var(--rarity-common); }
+.inventory-item.uncommon {
+    border-color: var(--rarity-uncommon);
+    box-shadow: 0 0 8px rgba(0, 255, 102, 0.3);
+}
+.inventory-item.rare {
+    border-color: var(--rarity-rare);
+    box-shadow: 0 0 8px rgba(0, 170, 255, 0.3);
+}
+.inventory-item.epic {
+    border-color: var(--rarity-epic);
+    box-shadow: 0 0 10px rgba(170, 136, 255, 0.4);
+}
+.inventory-item.super {
+    border-color: var(--warning);
+    box-shadow: 0 0 12px rgba(255, 170, 0, 0.5);
+    animation: glow-pulse 2s ease-in-out infinite;
+}
 .inventory-item.mega {
-    border-color: #ff00ff;
-    box-shadow: 0 0 15px #ff00ff;
     animation: rainbow 3s linear infinite;
-}
-
-@keyframes rainbow {
-    0% { border-color: #ff0000; }
-    16% { border-color: #ff8800; }
-    33% { border-color: #ffff00; }
-    50% { border-color: #00ff00; }
-    66% { border-color: #0088ff; }
-    83% { border-color: #aa00ff; }
-    100% { border-color: #ff0000; }
 }
 
 .inventory-item.temporary::after {
@@ -412,16 +734,22 @@ body {
     top: 2px;
     right: 2px;
     font-size: 14px;
+    text-shadow: 0 0 5px rgba(255, 170, 0, 0.8);
 }
 
 .inventory-item.permanent::after {
-    content: '✓';
+    content: '★';
     position: absolute;
     top: 2px;
     right: 2px;
     font-size: 14px;
-    color: #00ff00;
+    color: var(--success);
+    text-shadow: 0 0 5px var(--success);
 }
+
+/* ============================================
+   COMBINATION AREA
+   ============================================ */
 
 .combo-area {
     display: flex;
@@ -439,75 +767,177 @@ body {
 .combo-slot {
     width: 60px;
     height: 60px;
-    background: rgba(0, 50, 80, 0.5);
-    border: 2px dashed #00ffff;
-    border-radius: 5px;
+    background: var(--rust-dark);
+    border: 2px dashed var(--metal-medium);
+    border-radius: 3px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.combo-slot:hover {
+    border-color: var(--holo-cyan-bright);
+    box-shadow: 0 0 10px rgba(0, 255, 245, 0.3);
 }
 
 .combo-arrow {
     font-size: 30px;
-    color: #00ffff;
+    color: var(--text-holo);
+    text-shadow: 0 0 10px var(--holo-cyan-glow);
 }
 
 .combo-result {
     width: 80px;
     height: 80px;
-    background: rgba(0, 80, 50, 0.5);
-    border: 2px solid #00ff88;
-    border-radius: 5px;
+    background: var(--rust-dark);
+    border: 2px solid var(--holo-cyan-bright);
+    border-radius: 3px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 12px;
+    box-shadow: 0 0 15px rgba(0, 255, 245, 0.3);
 }
+
+/* ============================================
+   BUTTONS
+   ============================================ */
 
 .combine-btn {
     width: 100%;
-    background: linear-gradient(135deg, #00ff88 0%, #00aa55 100%);
-    border: none;
-    color: #000;
+    background: transparent;
+    border: 3px solid var(--holo-cyan-bright);
+    color: var(--text-holo);
     font-size: 18px;
     font-weight: bold;
     padding: 12px;
-    border-radius: 5px;
+    border-radius: 3px;
     cursor: pointer;
-    font-family: 'Courier New', monospace;
+    font-family: 'Share Tech Mono', 'Courier New', monospace;
     transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    box-shadow:
+        0 0 15px rgba(0, 255, 245, 0.3),
+        inset 0 0 15px rgba(0, 255, 245, 0.1);
+}
+
+.combine-btn:hover {
+    background: rgba(0, 255, 245, 0.1);
 }
 
 .combine-btn:disabled {
-    background: #333;
-    color: #666;
+    background: transparent;
+    border-color: var(--metal-dark);
+    color: var(--text-secondary);
     cursor: not-allowed;
+    box-shadow: none;
 }
 
 .combine-btn:not(:disabled):active {
     transform: scale(0.98);
+    box-shadow: 0 0 25px rgba(0, 255, 245, 0.6);
 }
 
 .close-btn {
     width: 100%;
-    background: rgba(100, 100, 100, 0.5);
-    border: 2px solid #888;
-    color: #fff;
+    background: transparent;
+    border: 2px solid var(--metal-medium);
+    color: var(--text-secondary);
     font-size: 16px;
     font-weight: bold;
     padding: 10px;
-    border-radius: 5px;
+    border-radius: 3px;
     cursor: pointer;
     margin-top: 10px;
-    font-family: 'Courier New', monospace;
+    font-family: 'Share Tech Mono', 'Courier New', monospace;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .close-btn:active {
-    background: rgba(150, 150, 150, 0.5);
+    background: rgba(74, 74, 74, 0.3);
+    border-color: var(--metal-light);
 }
 
-/* Responsive adjustments */
+/* ============================================
+   GRID INVENTORY SPECIFIC
+   ============================================ */
+
+.body-grid-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+.body-row-horizontal {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.body-grid-btn {
+    background: var(--rust-dark);
+    border: 3px solid var(--metal-medium);
+    border-radius: 3px;
+    padding: 12px;
+    min-width: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.body-grid-btn::before {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: radial-gradient(circle at 30% 30%, var(--metal-light), var(--metal-dark));
+    border-radius: 50%;
+    top: 5px;
+    left: 5px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
+}
+
+.body-grid-btn:hover,
+.body-grid-btn:active {
+    border-color: var(--holo-cyan-bright);
+    background: rgba(0, 255, 245, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0, 255, 245, 0.3);
+}
+
+.body-icon {
+    font-size: 24px;
+}
+
+.grid-fill {
+    font-size: 10px;
+    color: var(--text-secondary);
+    background: rgba(0, 0, 0, 0.3);
+    padding: 2px 6px;
+    border-radius: 2px;
+}
+
+.grid-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
 @media (max-width: 600px) {
     .equipped-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -519,5 +949,10 @@ body {
 
     .start-container h1 {
         font-size: 36px;
+    }
+
+    .body-grid-btn {
+        min-width: 80px;
+        padding: 8px;
     }
 }
