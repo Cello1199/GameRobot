@@ -28,16 +28,13 @@ class GridInventoryManager {
             this.synergyManager,
             this.rotationManager
         );
-        this.touchManager = new TouchManager(this.gridManager);
-        this.touchManager.init();
-
-        // Add context menu for removing parts
-        this.setupPartRemoval();
+        // Setup mouse controls for grid
+        this.setupMouseControls();
 
         this.setupEventHandlers();
     }
 
-    setupPartRemoval() {
+    setupMouseControls() {
         const canvas = this.gridManager.canvas;
 
         // Right-click to remove part
@@ -51,40 +48,36 @@ class GridInventoryManager {
                     this.updateAllGridFills();
                     this.updateAvailableParts();
                     this.updateSynergies();
-                    this.inventory.updateUI(); // Update classic view
+                    this.inventory.updateUI();
                 }
             }
         });
 
-        // Long press to remove part (mobile)
-        let longPressTimer;
-        canvas.addEventListener('touchstart', (e) => {
-            const touch = e.touches[0];
-            longPressTimer = setTimeout(() => {
-                const gridPos = this.gridManager.canvasToGrid(touch.clientX, touch.clientY);
-                if (gridPos) {
-                    const part = this.gridManager.isSlotOccupied(gridPos.x, gridPos.y);
-                    if (part) {
-                        // Vibrate if available
-                        if (navigator.vibrate) {
-                            navigator.vibrate(50);
-                        }
-                        this.gridManager.removePart(part);
-                        this.updateAllGridFills();
-                        this.updateAvailableParts();
-                        this.updateSynergies();
-                        this.inventory.updateUI();
-                    }
+        // Mouse move for hover effects
+        canvas.addEventListener('mousemove', (e) => {
+            const gridPos = this.gridManager.canvasToGrid(e.clientX, e.clientY);
+            if (gridPos) {
+                this.gridManager.hoveredSlot = gridPos;
+                this.gridManager.render();
+            }
+        });
+
+        // Mouse click to place part
+        canvas.addEventListener('click', (e) => {
+            if (this.gridManager.hoveredSlot && this.gridManager.selectedPart) {
+                const placed = this.gridManager.placePart(
+                    this.gridManager.selectedPart,
+                    this.gridManager.hoveredSlot.x,
+                    this.gridManager.hoveredSlot.y
+                );
+                if (placed) {
+                    this.gridManager.selectedPart = null;
+                    this.updateAllGridFills();
+                    this.updateAvailableParts();
+                    this.updateSynergies();
+                    this.inventory.updateUI();
                 }
-            }, 500); // 500ms long press
-        });
-
-        canvas.addEventListener('touchend', () => {
-            clearTimeout(longPressTimer);
-        });
-
-        canvas.addEventListener('touchmove', () => {
-            clearTimeout(longPressTimer);
+            }
         });
     }
 
@@ -120,6 +113,15 @@ class GridInventoryManager {
         if (autoFitBtn) {
             autoFitBtn.onclick = () => this.autoFitParts();
         }
+
+        // Keyboard shortcut for rotation (R key)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'r' || e.key === 'R') {
+                if (this.isGridViewActive && this.gridManager.selectedPart) {
+                    this.rotatePart();
+                }
+            }
+        });
     }
 
     toggleGridView() {

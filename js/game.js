@@ -28,7 +28,7 @@ class Game {
         this.lastTime = 0;
         this.animationId = null;
 
-        // Touch controls
+        // Keyboard controls
         this.setupControls();
 
         // UI setup
@@ -51,44 +51,7 @@ class Game {
     }
 
     setupControls() {
-        // Touch/Click controls
-        const controls = {
-            'btnLeft': 'left',
-            'btnRight': 'right',
-            'btnJump': 'jump',
-            'btnAttack': 'attack',
-            'btnSpecial': 'special',
-            'btnInventory': 'inventory'
-        };
-
-        for (let btnId in controls) {
-            const btn = document.getElementById(btnId);
-            const action = controls[btnId];
-
-            // Touch events
-            btn.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                this.handleInput(action, true);
-            });
-
-            btn.addEventListener('touchend', (e) => {
-                e.preventDefault();
-                this.handleInput(action, false);
-            });
-
-            // Mouse events (for testing on desktop)
-            btn.addEventListener('mousedown', (e) => {
-                e.preventDefault();
-                this.handleInput(action, true);
-            });
-
-            btn.addEventListener('mouseup', (e) => {
-                e.preventDefault();
-                this.handleInput(action, false);
-            });
-        }
-
-        // Keyboard controls (for testing)
+        // Keyboard controls
         window.addEventListener('keydown', (e) => {
             if (this.state !== 'playing') return;
 
@@ -143,31 +106,6 @@ class Game {
                     break;
             }
         });
-    }
-
-    handleInput(action, pressed) {
-        if (this.state !== 'playing') return;
-
-        switch (action) {
-            case 'left':
-                this.player.input.left = pressed;
-                break;
-            case 'right':
-                this.player.input.right = pressed;
-                break;
-            case 'jump':
-                if (pressed) this.player.input.jump = true;
-                break;
-            case 'attack':
-                if (pressed) this.handleAttack();
-                break;
-            case 'special':
-                if (pressed) this.handleSpecial();
-                break;
-            case 'inventory':
-                if (pressed) this.inventory.toggle();
-                break;
-        }
     }
 
     setupUI() {

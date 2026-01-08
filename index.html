@@ -176,30 +176,16 @@
                     <!-- Help Text -->
                     <div style="margin-top: 15px; padding: 10px; background: rgba(0,255,255,0.1); border: 1px solid #00ffff; border-radius: 4px; font-size: 11px; color: #aaa;">
                         <strong style="color: #00ffff;">ℹ️ STEUERUNG:</strong><br>
-                        • Teil aus Liste wählen<br>
-                        • Ins Grid klicken zum Platzieren<br>
-                        • Rechtsklick / Langes Drücken zum Entfernen<br>
-                        • Rotation-Button für 90° Drehung<br>
-                        • Auto-Fit für optimale Platzierung
+                        • <kbd>LINKSKLICK</kbd> auf Teil aus Liste wählen<br>
+                        • <kbd>LINKSKLICK</kbd> ins Grid zum Platzieren<br>
+                        • <kbd>RECHTSKLICK</kbd> auf platziertes Teil zum Entfernen<br>
+                        • <kbd>↻ 90°</kbd> Button oder <kbd>R</kbd> für Rotation<br>
+                        • <kbd>✨ AUTO-FIT</kbd> für optimale Platzierung
                     </div>
                 </div>
                 <!-- END GRID INVENTORY VIEW -->
 
-                <button id="closeInventory" class="close-btn">SCHLIESSEN</button>
-            </div>
-        </div>
-
-        <!-- Touch Controls -->
-        <div id="touchControls">
-            <div class="dpad-container">
-                <button class="control-btn dpad-btn" id="btnLeft" data-action="left">◀</button>
-                <button class="control-btn dpad-btn" id="btnRight" data-action="right">▶</button>
-            </div>
-            <div class="action-container">
-                <button class="control-btn action-btn" id="btnJump" data-action="jump">↑</button>
-                <button class="control-btn action-btn" id="btnAttack" data-action="attack">⚔</button>
-                <button class="control-btn special-btn" id="btnSpecial" data-action="special">✦</button>
-                <button class="control-btn inv-btn" id="btnInventory" data-action="inventory">⚙</button>
+                <button id="closeInventory" class="close-btn">SCHLIESSEN [ESC]</button>
             </div>
         </div>
 
@@ -211,8 +197,11 @@
                 <button id="startBtn" class="start-btn">SPIEL STARTEN</button>
                 <div class="instructions">
                     <h3>STEUERUNG:</h3>
-                    <p>◀▶ Bewegung | ↑ Springen | ⚔ Angreifen</p>
-                    <p>✦ Spezialfähigkeit | ⚙ Inventar</p>
+                    <p><kbd>A</kbd> <kbd>D</kbd> oder <kbd>←</kbd> <kbd>→</kbd> Bewegung</p>
+                    <p><kbd>W</kbd> oder <kbd>↑</kbd> oder <kbd>SPACE</kbd> Springen</p>
+                    <p><kbd>X</kbd> oder <kbd>J</kbd> Angreifen</p>
+                    <p><kbd>C</kbd> oder <kbd>K</kbd> Spezialfähigkeit</p>
+                    <p><kbd>I</kbd> oder <kbd>ESC</kbd> Inventar</p>
                 </div>
             </div>
         </div>
@@ -238,7 +227,6 @@
     <script src="js/synergy.js"></script>
     <script src="js/autofit.js"></script>
     <script src="js/expansion.js"></script>
-    <script src="js/touch.js"></script>
     <script src="js/ui.js"></script>
 
     <!-- Grid Integration -->
