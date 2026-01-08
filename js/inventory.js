@@ -218,6 +218,9 @@ class Inventory {
             filteredParts = this.parts.filter(p => p.isPermanent);
         }
 
+        // Filter out equipped parts (they should not show in inventory list)
+        filteredParts = filteredParts.filter(part => !this.isPartEquipped(part.id));
+
         // Filter out parts that are already placed in grid system
         if (window.gridInventoryManager && window.gridInventoryManager.gridManager) {
             filteredParts = filteredParts.filter(part => {
@@ -254,15 +257,34 @@ class Inventory {
                 ${shapePreview}
                 <strong style="display: block; text-align: center;">${part.name}</strong>
                 <small style="display: block; text-align: center;">${this.getPartTypeLabel(part.type)}</small>
+                <div style="text-align: center; font-size: 10px; color: #00ffff; margin-top: 4px;">
+                    Links: Ausrüsten | Rechts: Kombinieren
+                </div>
             `;
 
-            div.onclick = () => {
+            // Left click to equip
+            div.onclick = (e) => {
+                e.preventDefault();
                 if (!this.isPartEquipped(part.id)) {
                     this.equipPart(part.id);
                 }
             };
 
-            // Add long-press for adding to combo
+            // Right click to add to combo
+            div.oncontextmenu = (e) => {
+                e.preventDefault();
+                const added = this.addPartToFirstEmptyComboSlot(part.id);
+                if (added) {
+                    // Visual feedback
+                    div.style.opacity = '0.5';
+                    setTimeout(() => {
+                        div.style.opacity = '1';
+                    }, 200);
+                }
+                return false;
+            };
+
+            // Add long-press for adding to combo (mobile)
             let pressTimer;
             div.addEventListener('touchstart', (e) => {
                 pressTimer = setTimeout(() => {

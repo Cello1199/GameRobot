@@ -8,12 +8,12 @@ class Player {
         this.height = 50;
         this.inventory = inventory;
 
-        // Movement with acceleration - smoother values
+        // Movement with acceleration - much slower for less hectic gameplay
         this.vx = 0;
         this.vy = 0;
-        this.acceleration = 0.4; // Reduced for smoother acceleration
-        this.deceleration = 0.88; // Smoother deceleration
-        this.maxSpeed = 4; // Slightly slower for better control
+        this.acceleration = 0.3; // Further reduced
+        this.deceleration = 0.9; // Smoother stop
+        this.maxSpeed = 3; // Much slower
         this.onGround = false;
         this.facing = 1; // 1 = right, -1 = left
 
@@ -132,9 +132,9 @@ class Player {
             }
         }
 
-        // Apply gravity - reduced for less hectic gameplay (not during dash)
+        // Apply gravity - much slower for less hectic gameplay (not during dash)
         if (!this.onGround && !this.isDashing) {
-            this.vy += 0.4; // Reduced gravity
+            this.vy += 0.3; // Further reduced gravity
         }
 
         // Smooth horizontal movement with acceleration (not during dash)
@@ -308,7 +308,7 @@ class Player {
         let attack;
 
         if (this.weaponType === 'gun') {
-            // Projectile attack - reduced speed for less hectic gameplay
+            // Projectile attack - much slower for less hectic gameplay
             const centerX = this.x + this.width / 2;
             const centerY = this.y + this.height / 2;
 
@@ -316,13 +316,13 @@ class Player {
                 type: 'projectile',
                 x: centerX,
                 y: centerY,
-                vx: Math.cos(this.aimAngle) * 7, // Reduced from 10 to 7
-                vy: Math.sin(this.aimAngle) * 7,
+                vx: Math.cos(this.aimAngle) * 5, // Further reduced to 5
+                vy: Math.sin(this.aimAngle) * 5,
                 width: 8,
                 height: 8,
                 damage: this.damage,
                 piercing: this.canPierceShields,
-                lifetime: 150, // Increased lifetime since slower
+                lifetime: 180, // Increased lifetime since slower
                 angle: this.aimAngle
             };
         } else {
